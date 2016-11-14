@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">Google Login Test</string>
+    <string name="app_name">Read World</string>
+    <string name="guest_button">訪客登入</string>
 </resources>

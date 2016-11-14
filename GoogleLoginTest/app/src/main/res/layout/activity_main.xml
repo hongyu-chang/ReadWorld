@@ -5,59 +5,78 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.user.googlelogintest.MainActivity">
+    tools:context="com.example.user.googlelogintest.MainActivity"
+    android:background="#3e525b">
+
+    <ViewFlipper
+        android:layout_width="match_parent"
+        android:id="@+id/flipper"
+        android:layout_centerVertical="true"
+        android:layout_alignParentStart="true"
+        android:layout_height="270sp"
+        android:layout_below="@+id/iconImage"
+        android:layout_above="@+id/googleSignIn_button"
+        android:layout_marginBottom="30sp"
+        android:layout_marginTop="30sp">
+
+    </ViewFlipper>
 
     <TextView
-        android:text="Your Profile : "
+        android:text="Read World"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/imageView"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="43dp"
-        android:id="@+id/textView"
-        android:textSize="18sp"
-        android:textStyle="bold"/>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:id="@+id/name"
-        android:background="@color/common_action_bar_splitter"
-        android:layout_below="@+id/textView"
-        android:layout_alignParentStart="true"
-        android:textSize="16sp"
-        android:layout_height="180sp" />
-
-    <ImageView
-        app:srcCompat="@color/common_action_bar_splitter"
-        android:id="@+id/imageView"
-        android:layout_width="160sp"
-        android:layout_height="160sp"
+        android:layout_marginTop="32sp"
+        android:id="@+id/appTitle"
+        android:textColor="#ffffff"
+        android:textSize="35sp"
+        android:textStyle="bold"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
-    <com.google.android.gms.common.SignInButton
-        android:layout_width="wrap_content"
-        android:id="@+id/login"
-        android:layout_height="wrap_content"
-        android:filterTouchesWhenObscured="false"
-        android:textAlignment="center"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="17dp">
-    </com.google.android.gms.common.SignInButton>
+    <ImageView
+        app:srcCompat="@color/common_action_bar_splitter"
+        android:id="@+id/iconImage"
+        android:layout_below="@+id/appInfoText"
+        android:layout_centerHorizontal="true"
+        android:scaleType="fitXY"
+        android:layout_marginTop="20sp"
+        android:layout_width="60sp"
+        android:layout_height="60sp" />
 
     <Button
-        android:text="Sign Out"
+        android:text="@string/guest_button"
+        android:layout_width="300sp"
+        android:id="@+id/guest"
+        android:elevation="0dp"
+        android:textColor="#feffffff"
+        android:textStyle="bold"
+        android:layout_marginBottom="34dp"
+        android:backgroundTint="#485f6a"
+        android:layout_height="50sp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignStart="@+id/googleSignIn_button" />
+
+    <com.google.android.gms.common.SignInButton
+        android:layout_width="300sp"
+        android:layout_height="wrap_content"
+        android:id="@+id/googleSignIn_button"
+        android:filterTouchesWhenObscured="false"
+        android:textAlignment="center"
+
+        android:layout_marginBottom="10dp"
+        android:layout_above="@+id/guest"
+        android:layout_centerHorizontal="true">
+    </com.google.android.gms.common.SignInButton>
+
+    <TextView
+        android:text="The fastest way to find bookstore U want"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/logout"
-        android:layout_marginEnd="21dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true" />
-
+        android:id="@+id/appInfoText"
+        android:textColor="#ffffff"
+        android:textSize="18sp"
+        android:layout_marginTop="11dp"
+        android:layout_below="@+id/appTitle"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>
