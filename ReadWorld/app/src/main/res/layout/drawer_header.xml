@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="190dp"
+    android:background="#5a7a88"
+    >
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="24dp"
+        android:layout_marginStart="24dp"
+        android:layout_alignParentBottom="true"
+        android:text="A Boy"
+        android:textSize="14sp"
+        android:textColor="#fff"
+        android:textStyle="bold"
+        android:paddingBottom="8dp"
+        />
+
+    <ImageView
+        android:layout_width="120dp"
+        app:srcCompat="@drawable/boy"
+        android:id="@+id/frofilePic"
+        android:layout_height="120dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+
+</RelativeLayout>

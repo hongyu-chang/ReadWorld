@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_sign_in"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    tools:context="com.example.user.readworld.SignIn"
+    android:background="#3e525b"
+    android:fitsSystemWindows="false">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Read World"
+        android:id="@+id/mainTitle"
+        android:textColor="#ffffff"
+        android:textSize="35sp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="32sp"/>
+
+    <TextView
+        android:text="The fastest way to find bookstore U want"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/subTitle"
+        android:textColor="#ffffff"
+        android:textSize="18sp"
+        android:layout_marginTop="11dp"
+        android:layout_below="@+id/mainTitle"
+        android:layout_centerHorizontal="true" />
+
+    <ImageView
+        android:layout_width="60sp"
+        android:layout_height="60sp"
+        app:srcCompat="@drawable/icon"
+        android:layout_marginTop="13dp"
+        android:id="@+id/iconImage"
+        android:scaleType="fitXY"
+        android:layout_below="@+id/subTitle"
+        android:layout_centerHorizontal="true" />
+
+    <ViewFlipper
+        android:layout_width="match_parent"
+        android:id="@+id/flipper"
+        android:layout_height="270sp"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="30dp"
+        android:layout_below="@+id/iconImage"
+        android:layout_above="@+id/googleSignIn_button"
+        android:layout_alignParentStart="true">
+    </ViewFlipper>
+
+    <Button
+        android:text="訪客登入"
+        android:layout_marginBottom="25dp"
+        android:id="@+id/guest"
+        android:backgroundTint="#485f6a"
+        android:textColor="#feffffff"
+        android:textStyle="bold"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_width="330dp"
+        android:layout_height="60dp" />
+
+    <com.google.android.gms.common.SignInButton
+        android:layout_width="330dp"
+        android:id="@+id/googleSignIn_button"
+        android:layout_marginBottom="20dp"
+        android:layout_above="@+id/guest"
+        android:layout_alignStart="@+id/guest"
+        android:layout_height="55dp">
+    </com.google.android.gms.common.SignInButton>
+
+</RelativeLayout>

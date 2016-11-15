@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "501456049917",
+    "project_id": "readworld-149613"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:501456049917:android:ceb04bc94c67171f",
+        "android_client_info": {
+          "package_name": "com.example.user.readworld"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "501456049917-jp8t6v1sjur0tjjgj2thvjtdk2t1u94d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.user.readworld",
+            "certificate_hash": "31B41B2FDB8199AD44DCBF9D0C32823F66E08C4F"
+          }
+        },
+        {
+          "client_id": "501456049917-42ocvf4dkd1cn7tgrqlhbrb7ntcquhgj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBbM0ohNrY8Mbmo8FucUk6afUaKpkHXdiM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
