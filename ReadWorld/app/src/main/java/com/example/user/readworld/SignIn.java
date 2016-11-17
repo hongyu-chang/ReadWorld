@@ -44,6 +44,12 @@ public class SignIn extends AppCompatActivity implements GoogleApiClient.OnConne
     private static final int REQUEST_CODE = 100;// unknown
     private boolean isFirst = true;             // 第一次登入嗎?
 
+    String name;
+    String email;
+    String id;
+    Uri photoUri;
+    String photoString;
+
     // 自動播放圖片(目前10張)
     private int[] resid = {R.drawable.a01, R.drawable.a02, R.drawable.a03, R.drawable.a04, R.drawable.a05, R.drawable.a06, R.drawable.a07, R.drawable.a08, R.drawable.a09, R.drawable.a10};
 
@@ -119,15 +125,11 @@ public class SignIn extends AppCompatActivity implements GoogleApiClient.OnConne
             public void onClick(View v) {
                 Toast.makeText(v.getContext(), "訪客登入", Toast.LENGTH_SHORT).show();
 
-                saveSetting();
-
                 // 進入下一個activity
                 Intent intent = new Intent();
                 intent.setClass(SignIn.this, MainActivity.class);
                 startActivity(intent);
                 SignIn.this.finish();
-
-
             }
         });
         // [END guestLogIn]
@@ -154,8 +156,6 @@ public class SignIn extends AppCompatActivity implements GoogleApiClient.OnConne
             saveSetting();
 
             // 傳送個人資訊, 進入下一個activity
-
-
             Intent intent = new Intent();
             intent.setClass(SignIn.this, MainActivity.class);
 
@@ -185,6 +185,10 @@ public class SignIn extends AppCompatActivity implements GoogleApiClient.OnConne
     private void saveSetting() {
         SharedPreferences setting = getSharedPreferences("profile_info", 0);
         setting.edit().putBoolean("isFirst", false).commit();
+        setting.edit().putString("id", null).commit();
+        setting.edit().putString("name", null).commit();
+        setting.edit().putString("email", null).commit();
+        setting.edit().putString("photoUri", null).commit();
     } // [END saveSetting]
 
     // [START readSetting] 讀取設定狀態

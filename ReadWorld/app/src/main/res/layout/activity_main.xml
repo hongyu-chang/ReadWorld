@@ -23,8 +23,8 @@
         <TextView
             android:id="@+id/content_view"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Hello World" />
+            android:layout_height="wrap_content"/>
+
     </LinearLayout>
 
     <android.support.design.widget.NavigationView
@@ -32,6 +32,6 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        app:headerLayout="@layout/drawer_header"
+        android:fitsSystemWindows="true"
         app:menu="@menu/drawer" />
 </android.support.v4.widget.DrawerLayout>

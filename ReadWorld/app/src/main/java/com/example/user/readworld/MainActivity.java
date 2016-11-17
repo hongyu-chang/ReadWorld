@@ -5,7 +5,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
+import android.provider.ContactsContract;
 import android.support.design.widget.NavigationView;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
@@ -17,15 +20,28 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jaeger.library.StatusBarUtil;
+import com.squareup.picasso.Picasso;
+
+import java.net.URI;
 
 public class MainActivity extends AppCompatActivity {
 
     DrawerLayout drawerLayout;
     TextView contentView;
+    TextView nameOrGuest;
+    TextView emailOrSignIn;
+    ImageView profilePic;
+
+    String name;
+    String email;
+    String id;
+    Uri photoUri;
+    String photoString;
 
     private int navItemId;
 
@@ -41,7 +57,79 @@ public class MainActivity extends AppCompatActivity {
         contentView = (TextView) findViewById(R.id.content_view);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         NavigationView view = (NavigationView) findViewById(R.id.navigation_view);
+        View header = view.inflateHeaderView(R.layout.drawer_header);
         view.setItemIconTintList(null);
+
+        MenuItem signOutOption = view.getMenu().findItem(R.id.signOut);
+        MenuItem myFavoritesOption = view.getMenu().findItem(R.id.myFavorites);
+
+        nameOrGuest = (TextView) header.findViewById(R.id.NameOrGuest);
+        emailOrSignIn = (TextView) header.findViewById(R.id.EmailOrSignIn);
+        profilePic = (ImageView) header.findViewById(R.id.ProfilePic);
+
+        // 接收google帳戶資訊
+        Intent intent = this.getIntent();
+        name = intent.getStringExtra("name");
+        email = intent.getStringExtra("email");
+        id = intent.getStringExtra("id");
+        photoUri = intent.getParcelableExtra("photoUri");
+
+        // 若google登入
+        if(id != null) {
+            nameOrGuest.setText(name);
+            emailOrSignIn.setText(email);
+            if(photoUri != null) { // 有照片
+                Picasso.with(this.getApplicationContext()).load(photoUri).into(profilePic);
+            }
+        }
+        // 從SharedPreferences找
+        else {
+            readSetting();
+            if (id != null) {
+                nameOrGuest.setText(name);
+                emailOrSignIn.setText(email);
+                photoUri = Uri.parse(photoString);
+
+                if (photoUri != null) { // 有照片
+                    Picasso.with(this.getApplicationContext()).load(photoUri).into(profilePic);
+                }
+            }
+            else { // 訪客登入
+                nameOrGuest.setText("訪客");
+                emailOrSignIn.setText("點這裡登入");
+                myFavoritesOption.setVisible(false);    // 沒有我的最愛選項
+                signOutOption.setVisible(false);        // 沒有登出選項
+            }
+        }
+
+        contentView.setText("name: "+name+"\nemail: "+email+"\nid: "+id+"\nuri: "+photoUri);
+
+        // 點這裡登入
+        emailOrSignIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(id != null) {} // 若有登入則不會有動作
+                else {
+                    Intent intent = new Intent();
+                    intent.setClass(MainActivity.this, SignIn.class);
+                    startActivity(intent);
+                    MainActivity.this.finish();
+                }
+            }
+        });
+        // 點大頭貼也可登入
+        profilePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(id != null) {} // 若有登入則不會有動作
+                else {
+                    Intent intent = new Intent();
+                    intent.setClass(MainActivity.this, SignIn.class);
+                    startActivity(intent);
+                    MainActivity.this.finish();
+                }
+            }
+        });
 
         // 按鍵後的動作
         view.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -69,9 +157,11 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case R.id.signOut:
                         toolbar.setTitle(R.string.signOut);
+                        clearSetting();
                         signOut();
                         break;
                     case R.id.exit:
+                        savingSetting();
                         finish();
                         break;
                     default:
@@ -80,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 Toast.makeText(MainActivity.this, menuItem.getTitle() + " pressed", Toast.LENGTH_LONG).show();
-                contentView.setText(menuItem.getTitle());
+                //contentView.setText(menuItem.getTitle());
 
                 menuItem.setChecked(true);
                 drawerLayout.closeDrawers();
@@ -95,14 +185,12 @@ public class MainActivity extends AppCompatActivity {
             // 關起來側邊攔
             public void onDrawerClosed(View drawerView) {
                 super .onDrawerClosed(drawerView);
-                StatusBarUtil.setColor(MainActivity.this, 0x394B54);
             }
 
             // 打開側邊攔
             @Override
             public void onDrawerOpened(View drawerView) {
                 super .onDrawerOpened(drawerView);
-                StatusBarUtil.setColor(MainActivity.this, 0x5A7A88);
             }
         };
 
@@ -119,6 +207,7 @@ public class MainActivity extends AppCompatActivity {
 
         navigateTo(view.getMenu().findItem(navItemId));
 
+
     } // [END onCreate]
 
     @Override
@@ -133,6 +222,7 @@ public class MainActivity extends AppCompatActivity {
 
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
+                            savingSetting();
                             finish();
                         }
                     })
@@ -168,6 +258,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // 點右上角的功能
+    /*
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -175,26 +266,12 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        switch (id)
-        {
-            case R.id.action_settings:
-                break;
-            case R.id.action_about:
-                break;
-            case R.id.action_exit:
-                finish();
-                break;
-            default:
-                break;
-        }
-
-
         return super.onOptionsItemSelected(item);
     }
-
+    */
 
     private void navigateTo(MenuItem menuItem){
-        contentView.setText(menuItem.getTitle());
+        //contentView.setText(menuItem.getTitle());
 
         navItemId = menuItem.getItemId();
         menuItem.setChecked(true);
@@ -216,13 +293,28 @@ public class MainActivity extends AppCompatActivity {
         MainActivity.this.finish();
     }
 
+    private void savingSetting() {
+        SharedPreferences setting = getSharedPreferences("profile_info", 0);
+        setting.edit().putString("id", id).commit();
+        setting.edit().putString("name", name).commit();
+        setting.edit().putString("email", email).commit();
+        setting.edit().putString("photoUri", photoUri.toString()).commit();
+    }
 
+    private void readSetting() {
+        SharedPreferences setting = getSharedPreferences("profile_info", 0);
+        id = setting.getString("id", null);
+        name = setting.getString("name", null);
+        email = setting.getString("email", null);
+        photoString = setting.getString("photoUri", null);
+    }
 
-
-
-
-
-
-
+    private void clearSetting() {
+        SharedPreferences setting = getSharedPreferences("profile_info", 0);
+        setting.edit().putString("id", null).commit();
+        setting.edit().putString("name", null).commit();
+        setting.edit().putString("email", null).commit();
+        setting.edit().putString("photoUri", null).commit();
+    }
 
 }

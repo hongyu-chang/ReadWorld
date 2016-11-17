@@ -7,7 +7,7 @@
     >
 
     <TextView
-        android:id="@+id/name"
+        android:id="@+id/NameOrGuest"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="24dp"
@@ -17,11 +17,11 @@
         android:textStyle="bold"
         android:paddingTop="10dp"
         android:paddingBottom="5dp"
-        android:layout_below="@+id/frofilePic"
+        android:layout_below="@+id/ProfilePic"
         android:layout_centerHorizontal="true" />
 
     <TextView
-        android:id="@+id/clickToSignIn"
+        android:id="@+id/EmailOrSignIn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="24dp"
@@ -31,27 +31,28 @@
         android:textColor="#dddddd"
         android:textStyle="bold"
         android:paddingTop="0dp"
-        android:layout_below="@+id/name"
+        android:layout_below="@+id/NameOrGuest"
         android:layout_centerHorizontal="true"
          />
 
     <ImageView
         app:srcCompat="@drawable/user"
-        android:id="@+id/frofilePic"
+        android:id="@+id/ProfilePic"
         android:layout_marginLeft="10dp"
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:layout_alignParentTop="true"
-        android:layout_alignStart="@+id/name"
+        android:layout_alignStart="@+id/NameOrGuest"
         android:layout_marginTop="39dp"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:scaleType="fitXY"/>
 
     <ImageView
         android:layout_width="25dp"
         android:layout_height="25dp"
         app:srcCompat="@drawable/settings"
-        android:layout_alignTop="@+id/frofilePic"
-        android:layout_alignEnd="@+id/name"
+        android:layout_alignTop="@+id/ProfilePic"
+        android:layout_alignEnd="@+id/NameOrGuest"
         android:id="@+id/settingOption"/>
 
 
