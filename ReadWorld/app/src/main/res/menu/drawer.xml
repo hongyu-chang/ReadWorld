@@ -1,45 +1,49 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <group android:checkableBehavior="single">
-            <item
-                android:id="@+id/mainPage"
-                android:checked="true"
-                android:icon="@drawable/icon"
-                android:title="@string/mainPage"/>
-            <item
-                android:id="@+id/myFavorites"
-                android:icon="@drawable/icon"
-                android:title="@string/myFavorites"/>
-            <item
-                android:id="@+id/overview"
-                android:icon="@drawable/icon"
-                android:title="@string/overview"/>
-            <item
-                android:id="@+id/map"
-                android:icon="@drawable/icon"
-                android:title="@string/map"/>
-            <item
-                android:id="@+id/nearby"
-                android:checked="true"
-                android:icon="@drawable/icon"
-                android:title="@string/nearby"/>
-            <item
-                android:id="@+id/setting"
-                android:checked="true"
-                android:icon="@drawable/icon"
-                android:title="@string/setting"/>
-            <item
-                android:id="@+id/exit"
-                android:checked="true"
-                android:icon="@drawable/icon"
-                android:title="@string/exit"/>
-            <item
-                android:id="@+id/signOut"
-                android:checked="true"
-                android:icon="@drawable/icon"
-                android:title="@string/signOut"/>
-            <item
-                android:id="@+id/signIn"
-                android:icon="@drawable/icon"
-                android:title="@string/signIn"/>
+
+    <group
+        android:checkableBehavior="single"
+        android:id="@+id/group1">
+
+        <item
+            android:id="@+id/overview"
+            android:icon="@drawable/overview"
+            android:title="@string/overview"/>
+        <item
+            android:id="@+id/nearby"
+            android:icon="@drawable/nearby"
+            android:title="@string/nearby"/>
+        <item
+            android:id="@+id/map"
+            android:icon="@drawable/map"
+            android:title="@string/map"/>
+
+        <item
+            android:id="@+id/myFavorites"
+            android:icon="@drawable/myfavorite"
+            android:title="@string/myFavorites"/>
     </group>
+
+    <group
+        android:checkableBehavior="single"
+        android:id="@+id/group2">
+
+        <item
+            android:id="@+id/setting"
+            android:icon="@drawable/setting"
+            android:title="@string/setting"/>
+        <item
+            android:id="@+id/info"
+            android:icon="@drawable/info"
+            android:title="@string/info"/>
+        <item
+            android:id="@+id/signOut"
+            android:icon="@drawable/signout"
+            android:title="@string/signOut"/>
+        <item
+            android:id="@+id/exit"
+            android:icon="@drawable/exit"
+            android:title="@string/exit"/>
+    </group>
+
+
 </menu>

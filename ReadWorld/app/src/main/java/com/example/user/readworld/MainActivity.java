@@ -2,15 +2,18 @@ package com.example.user.readworld;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,8 +34,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        StatusBarUtil.setColor(MainActivity.this, 0x394B54);
-
         // 將 ToolBar設為 ActionBar
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
         contentView = (TextView) findViewById(R.id.content_view);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         NavigationView view = (NavigationView) findViewById(R.id.navigation_view);
+        view.setItemIconTintList(null);
 
         // 按鍵後的動作
         view.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -47,33 +49,30 @@ public class MainActivity extends AppCompatActivity {
 
                 switch (menuItem.getItemId())
                 {
-                    case R.id.mainPage:
-                        toolbar.setTitle(R.string.mainPage);
-                        break;
-                    case R.id.myFavorites:
-                        toolbar.setTitle(R.string.myFavorites);
-                        break;
                     case R.id.overview:
                         toolbar.setTitle(R.string.overview);
-                        break;
-                    case R.id.map:
-                        toolbar.setTitle(R.string.map);
                         break;
                     case R.id.nearby:
                         toolbar.setTitle(R.string.nearby);
                         break;
+                    case R.id.map:
+                        toolbar.setTitle(R.string.map);
+                        break;
+                    case R.id.myFavorites:
+                        toolbar.setTitle(R.string.myFavorites);
+                        break;
                     case R.id.setting:
                         toolbar.setTitle(R.string.setting);
                         break;
-                    case R.id.exit:
-                        toolbar.setTitle(R.string.exit);
+                    case R.id.info:
+                        toolbar.setTitle(R.string.info);
                         break;
                     case R.id.signOut:
                         toolbar.setTitle(R.string.signOut);
                         signOut();
                         break;
-                    case R.id.signIn:
-                        toolbar.setTitle(R.string.signIn);
+                    case R.id.exit:
+                        finish();
                         break;
                     default:
                         break;
@@ -112,16 +111,40 @@ public class MainActivity extends AppCompatActivity {
         actionBarDrawerToggle.syncState();
 
         if(null != savedInstanceState){
-            navItemId = savedInstanceState.getInt("NAV_ITEM_ID", R.id.mainPage);
+            navItemId = savedInstanceState.getInt("NAV_ITEM_ID", R.id.overview);
         }
         else{
-            navItemId = R.id.mainPage;
+            navItemId = R.id.overview;
         }
 
         navigateTo(view.getMenu().findItem(navItemId));
 
     } // [END onCreate]
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            new AlertDialog.Builder(MainActivity.this)
+                    .setTitle("確認視窗")
+                    .setMessage("確定要結束應用程式嗎?")
+                    .setIcon(R.drawable.icon)
+                    .setPositiveButton("確定", new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+                    })
+                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    }).show();
+        }
+        return true;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -144,6 +167,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    // 點右上角的功能
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -151,10 +175,19 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id)
+        {
+            case R.id.action_settings:
+                break;
+            case R.id.action_about:
+                break;
+            case R.id.action_exit:
+                finish();
+                break;
+            default:
+                break;
         }
+
 
         return super.onOptionsItemSelected(item);
     }
