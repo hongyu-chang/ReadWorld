@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -27,6 +28,9 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.plus.Plus;
 import com.jaeger.library.StatusBarUtil;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static com.example.user.readworld.R.id.flipper;
 
@@ -49,6 +53,9 @@ public class SignIn extends AppCompatActivity implements GoogleApiClient.OnConne
     String id;
     Uri photoUri;
     String photoString;
+
+    private static Boolean isExit = false;
+    private static Boolean hasTask = false;
 
     // 自動播放圖片(目前10張)
     private int[] resid = {R.drawable.a01, R.drawable.a02, R.drawable.a03, R.drawable.a04, R.drawable.a05, R.drawable.a06, R.drawable.a07, R.drawable.a08, R.drawable.a09, R.drawable.a10};
@@ -205,6 +212,37 @@ public class SignIn extends AppCompatActivity implements GoogleApiClient.OnConne
 
         }
     } // [END readSetting]
+
+    Timer timerExit = new Timer();
+    TimerTask task = new TimerTask() {
+        @Override
+        public void run() {
+            isExit = false;
+            hasTask = true;
+        }
+    };
+
+    // 按虛擬按鍵
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            // 是否要退出
+            if(isExit == false) {
+
+                isExit = true;
+                Toast.makeText(this, "再按一次離開", Toast.LENGTH_SHORT).show();
+
+                if (!hasTask) {
+                    timerExit.schedule(task, 2000);
+                }
+            }
+            else {
+                finish();
+            }
+        }
+        return true;
+    }
 
 
     @Override
