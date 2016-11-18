@@ -151,6 +151,7 @@ public class SignIn extends AppCompatActivity implements GoogleApiClient.OnConne
             String email = account.getEmail();      // 信箱
             String id = account.getId();            // *使用id來記錄, 辨識user
             Uri photoImage = account.getPhotoUrl(); // 個人相片
+            String photoString = String.valueOf(photoImage);
 
             // 設定檔, 下次開啟會跳過此activity
             saveSetting();
@@ -162,7 +163,7 @@ public class SignIn extends AppCompatActivity implements GoogleApiClient.OnConne
             intent.putExtra("name", name);
             intent.putExtra("email", email);
             intent.putExtra("id", id);
-            intent.putExtra("photoUri", photoImage);
+            intent.putExtra("photoString", photoString);
 
             startActivity(intent);
             SignIn.this.finish();

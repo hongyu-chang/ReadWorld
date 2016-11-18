@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:layout_gravity="center"
     tools:context="com.example.user.readworld.SignIn"
-    android:background="#3e525b"
+    android:background="@drawable/cover"
     android:fitsSystemWindows="false">
 
     <TextView
@@ -57,13 +57,14 @@
         android:text="訪客登入"
         android:layout_marginBottom="25dp"
         android:id="@+id/guest"
-        android:backgroundTint="#485f6a"
+        android:backgroundTint="#00ffffff"
         android:textColor="#feffffff"
         android:textStyle="bold"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_width="330dp"
-        android:layout_height="60dp" />
+        android:layout_height="60dp"
+        android:textSize="16sp" />
 
     <com.google.android.gms.common.SignInButton
         android:layout_width="330dp"
