@@ -284,6 +284,7 @@ public class MainActivity extends AppCompatActivity {
 
     } // [END onCreate]
 
+    // 按虛擬按鍵
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
@@ -357,6 +358,7 @@ public class MainActivity extends AppCompatActivity {
         outState.putInt("NAV_ITEM_ID", navItemId);
     }
 
+    // 登出
     private void signOut() {
         SharedPreferences setting = getSharedPreferences("profile_info", 0);
         setting.edit().putBoolean("isFirst", true).commit();
@@ -368,6 +370,7 @@ public class MainActivity extends AppCompatActivity {
         MainActivity.this.finish();
     }
 
+    // 儲存user資料
     private void savingSetting() {
         SharedPreferences setting = getSharedPreferences("profile_info", 0);
         setting.edit().putString("id", id).commit();
@@ -376,6 +379,7 @@ public class MainActivity extends AppCompatActivity {
         setting.edit().putString("photoString", photoString).commit();
     }
 
+    // 讀取user資料
     private void readSetting() {
         SharedPreferences setting = getSharedPreferences("profile_info", 0);
         id = setting.getString("id", null);
@@ -384,6 +388,7 @@ public class MainActivity extends AppCompatActivity {
         photoString = setting.getString("photoString", null);
     }
 
+    // 清掉user資料 (登出時呼叫)
     private void cleanSetting() {
         SharedPreferences setting = getSharedPreferences("profile_info", 0);
         setting.edit().putString("id", null).commit();
@@ -392,6 +397,7 @@ public class MainActivity extends AppCompatActivity {
         setting.edit().putString("photoString", null).commit();
     }
 
+    // 把string以\n分割 存成string[]
     private void splitStoreString() {
         name = storeName.split("\n");
         representImage = storeRepresentImage.split("\n");
@@ -408,6 +414,7 @@ public class MainActivity extends AppCompatActivity {
         arriveWay = storeArriveWay.split("\n");
     }
 
+    // 將書店秀出來
     private void display() {
 
         ArrayList<HashMap<String,String>> list = new ArrayList<HashMap<String,String>>();
