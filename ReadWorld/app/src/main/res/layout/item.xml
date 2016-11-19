@@ -20,25 +20,64 @@
         <TextView
             android:id="@+id/main"
             android:layout_height="wrap_content"
-            android:textSize="25sp"
-            android:layout_margin="4dp"
-            android:layout_width="match_parent"
-            android:text="書店"
-            android:padding="3dp"
+            android:textSize="20sp"
+            android:text="店名"
+            android:padding="5dp"
             android:ellipsize="end"
-            android:lines="1"/>
+            android:lines="1"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            android:layout_marginTop="3dp"
+            android:layout_width="220dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true" />
 
         <TextView
-            android:text="介紹"
+            android:text="縣市"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/main"
             android:layout_alignStart="@+id/main"
-            android:id="@+id/info"
+            android:id="@+id/city"
             android:textSize="14sp"
-            android:lines="4"
+            android:lines="1"
             android:ellipsize="end"
-            android:padding="7dp" />
+            android:padding="4dp" />
+
+        <TextView
+            android:text="地址"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/city"
+            android:layout_alignStart="@+id/city"
+            android:id="@+id/addr"
+            android:textSize="14sp"
+            android:lines="1"
+            android:ellipsize="end"
+            android:padding="4dp" />
+
+        <TextView
+            android:text="營業時間"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/time"
+            android:textSize="14sp"
+            android:lines="1"
+            android:ellipsize="end"
+            android:padding="4dp"
+            android:layout_below="@+id/addr"
+            android:layout_alignStart="@+id/addr" />
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            card_view:srcCompat="@drawable/bookstore"
+            android:id="@+id/store_image"
+            android:layout_alignBottom="@+id/time"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="15dp"
+            android:scaleType="fitStart"/>
+
 
     </RelativeLayout>
 </android.support.v7.widget.CardView>

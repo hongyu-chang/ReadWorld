@@ -7,6 +7,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -15,6 +17,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -26,6 +29,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -48,6 +52,7 @@ import org.json.JSONException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -70,20 +75,19 @@ import android.support.v4.widget.SwipeRefreshLayout;
 public class MainActivity extends AppCompatActivity {
 
     DrawerLayout drawerLayout;
-    TextView contentView;
-    TextView nameOrGuest;
-    TextView emailOrSignIn;
-    ImageView profilePic;
+    TextView nameOrGuest;               // 有登入顯示姓名, 否則顯示 "訪客"
+    TextView emailOrSignIn;             // 有登入顯示email, 否則顯示 "點這裡登入"
+    ImageView profilePic;               // 頭像
 
-    // for  dynamic view
-    LinearLayout linearLayout;
-    ListView storeList;
-    TextView empty;                     // 清空
-    SwipeRefreshLayout refresh;
-    CardView card;
-    RecyclerView recycle;
+    // for  dynamic view, 動態新增物件在main裡
+    LinearLayout linearLayout;          // 外面大框框 (從這個view丟進去)
+    ListView storeList;                 // 列出所有書店的list
+    TextView empty;                     // 點擊其他功能要先把目前的view清空
+    SwipeRefreshLayout refresh;         // 下滑重新整理(還沒做)
+    CardView card;                      // 用卡片的方式來列出所有書店
+    RecyclerView recycle;               // 卡片要裝進這個view來顯示
 
-    // for google user information
+    // for google user information, google登入後的資訊
     String userName;                    // 使用者姓名
     String userEmail;                   // 使用者信箱
     String id;                          // *使用者id
@@ -92,22 +96,9 @@ public class MainActivity extends AppCompatActivity {
 
     // for Json Read information
     private String urlArray = "http://cloud.culture.tw/frontsite/trans/emapOpenDataAction.do?method=exportEmapJson&typeId=M";
-    int dataCount = 0;
+    int dataCount = 0;                  // 資料數
 
-    String[] name = new String[]{};
-    String[] representImage = new String[]{};
-    String[] intro = new String[]{};
-    String[] cityName = new String[]{};
-    String[] address = new String[]{};
-    String[] longitude = new String[]{};
-    String[] latitude = new String[]{};
-    String[] openTime = new String[]{};
-    String[] phone = new String[]{};
-    String[] email = new String[]{};
-    String[] facebook = new String[]{};
-    String[] website = new String[]{};
-    String[] arriveWay = new String[]{};
-
+    // 從Json抓下來的資料先存這
     String storeName = "";              // 店名
     String storeRepresentImage = "";    // 圖像
     String storeIntro = "";             // 簡介
@@ -122,11 +113,29 @@ public class MainActivity extends AppCompatActivity {
     String storeWebsite = "";           // 網站
     String storeArriveWay = "";         // 如何到達
 
+    // 再把上面一串資料以"\n"做分割存成array
+    String[] name = new String[]{};
+    String[] representImage = new String[]{};
+    String[] intro = new String[]{};
+    String[] cityName = new String[]{};
+    String[] address = new String[]{};
+    String[] longitude = new String[]{};
+    String[] latitude = new String[]{};
+    String[] openTime = new String[]{};
+    String[] phone = new String[]{};
+    String[] email = new String[]{};
+    String[] facebook = new String[]{};
+    String[] website = new String[]{};
+    String[] arriveWay = new String[]{};
+
+    // 不知道是甚麼(?
     private int navItemId;
 
+    // 離開時需要點兩下所記錄的boolean值
     private static Boolean isExit = false;
     private static Boolean hasTask = false;
 
+    // 和定位有關的
     private LocationManager mLocationManager;
 
     @Override
@@ -135,11 +144,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         linearLayout = (LinearLayout) findViewById(R.id.linearlayout);
-        storeList = new ListView(this);
-        card = (CardView) findViewById(R.id.card_view);
         recycle = (RecyclerView) findViewById(R.id.recycler_view);
-        empty = new TextView(this);
+        card = (CardView) findViewById(R.id.card_view);
+        //storeList = new ListView(this); // 目前不使用listview, 用cardview
 
+        empty = new TextView(this); // 清空的
+
+        // 下拉重新整理(還沒做...)
         /*
         refresh = (SwipeRefreshLayout) findViewById(R.id.refresh_layout);
         refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -153,22 +164,24 @@ public class MainActivity extends AppCompatActivity {
         // 解析json (背景運作)
         new JsonParse().execute(urlArray);
 
-        // 點擊商店後的事件
+        // 點擊商店後的事件 (因為用cardview取代所以目前不需要)
+        /*
         storeList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, android.view.View view, int position, long id) {
                 //Toast.makeText(getApplicationContext(), position+1+"", Toast.LENGTH_SHORT).show();
             }
         });
+        */
 
-        // 狀態欄顏色
+        // 設定狀態欄顏色
         StatusBarUtil.setColor(MainActivity.this, 0x6C4113);
 
         // 將 ToolBar設為 ActionBar
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //contentView = (TextView) findViewById(R.id.content_view);
+        // 這和drawer_header有關
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         NavigationView view = (NavigationView) findViewById(R.id.navigation_view);
         View header = view.inflateHeaderView(R.layout.drawer_header);
@@ -189,33 +202,32 @@ public class MainActivity extends AppCompatActivity {
         photoString = intent.getStringExtra("photoString");
 
         // 若google登入
-        if (id != null) {
+        if (id != null) { // 有id表示有登入
             nameOrGuest.setText(userName);
             emailOrSignIn.setText(userEmail);
-            if (photoString != null) { // 有照片
+            if (photoString != null) { // 如果有照片
                 Picasso.with(this.getApplicationContext()).load(photoString).into(profilePic);
             }
         }
         // 從SharedPreferences找
+        // 重開app, 資料會存在SharedPreferences, 而"接收google帳戶資訊"會沒資料, 所以要從SharedPreferences找
         else {
             readSetting();
             if (id != null) {
                 nameOrGuest.setText(userName);
                 emailOrSignIn.setText(userEmail);
-                //photoUri = Uri.parse(photoString);
-
-                if (photoString != null) { // 有照片
+                if (photoString != null) { // 如果有照片
                     Picasso.with(this.getApplicationContext()).load(photoString).into(profilePic);
                 }
-            } else { // 訪客登入
+            }
+            else { // 找不到資料的話, 就是訪客了
                 nameOrGuest.setText("訪客");
                 emailOrSignIn.setText("點這裡登入");
                 myFavoritesOption.setVisible(false);    // 沒有我的最愛選項
-                signOutOption.setVisible(false);        // 沒有登出選項
+                signOutOption.setVisible(false);        // 沒有登出選項(因為沒登入)
             }
         }
 
-        //contentView.setText("name: "+userName+"\nemail: "+userEmail+"\nid: "+id+"\nuri: "+photoUri);
 
         // 點這裡登入
         emailOrSignIn.setOnClickListener(new View.OnClickListener() {
@@ -246,7 +258,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // 按鍵後的動作
+        // 按側邊攔功能的動作
         view.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
@@ -278,7 +290,6 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case R.id.signOut:
                         toolbar.setTitle(R.string.signOut);
-                        cleanSetting();
                         signOut();
                         break;
                     case R.id.exit:
@@ -294,11 +305,10 @@ public class MainActivity extends AppCompatActivity {
                 //contentView.setText(menuItem.getTitle());
 
                 menuItem.setChecked(true);
-                drawerLayout.closeDrawers();
+                drawerLayout.closeDrawers(); // 按完要關起來
                 return true;
             }
         });
-
 
         // 加上 actionBarDrawerToggle
         ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.openDrawer, R.string.closeDrawer) {
@@ -330,6 +340,7 @@ public class MainActivity extends AppCompatActivity {
 
     } // [END onCreate]
 
+    // 跟按兩下關閉有關
     Timer timerExit = new Timer();
     TimerTask task = new TimerTask() {
         @Override
@@ -343,20 +354,29 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            // 是否要退出
-            if (isExit == false) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) { // 按了返回鍵
 
-                isExit = true;
-                Toast.makeText(this, "再按一次離開", Toast.LENGTH_SHORT).show();
-
-                if (!hasTask) {
-                    timerExit.schedule(task, 2000);
-                }
-            } else {
-                savingSetting();
-                finish();
+            // 如果側邊攔有開啟要先關閉
+            if(drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                drawerLayout.closeDrawers();
             }
+            // 如果沒開啟就是要退出app
+            else {
+                // 是否要退出
+                if (isExit == false) {
+
+                    isExit = true;
+                    Toast.makeText(this, "再按一次離開", Toast.LENGTH_SHORT).show();
+
+                    if (!hasTask) {
+                        timerExit.schedule(task, 2000);
+                    }
+                } else {
+                    savingSetting();
+                    finish();
+                }
+            }
+
         }
         return true;
     }
@@ -382,7 +402,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    // 點右上角的功能
+    // 點右上角的功能 可能砍掉
     /*
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -462,11 +482,9 @@ public class MainActivity extends AppCompatActivity {
         facebook = storeFacebook.split("\n");
         website = storeWebsite.split("\n");
         arriveWay = storeArriveWay.split("\n");
-
-
     }
 
-    // 將書店秀出來
+    // 將書店秀出來 (這是listview, 目前用不到)
     private void display() {
 
         ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
@@ -487,19 +505,12 @@ public class MainActivity extends AppCompatActivity {
 
     // 總覽
     private void overview() {
-        // 先把內容清空
-        //linearLayout.removeView(storeList);
-        //storeList.setEmptyView(empty);
         recycle.setVisibility(View.VISIBLE);
 
-        display();                        // show
     }
 
     // 附近的店家
     private void nearby() {
-        // 先把內容清空
-        //linearLayout.removeView(card);
-        //storeList.setEmptyView(empty);
         recycle.setVisibility(View.INVISIBLE);
 
 
@@ -525,9 +536,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "請開啟定位服務", Toast.LENGTH_LONG).show();
             startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));	//開啟設定頁面
         }
-
-
-    }
+    } // end nearby
 
     //更新定位Listener
     public LocationListener LocationChange = new LocationListener()
@@ -563,35 +572,23 @@ public class MainActivity extends AppCompatActivity {
 
     // 地圖
     private void map() {
-        // 先把內容清空
-        //linearLayout.removeView(storeList);
-        //storeList.setEmptyView(empty);
         recycle.setVisibility(View.INVISIBLE);
 
+
     }
+    // 我的最愛
     private void myFavorite() {
-        // 先把內容清空
-        //linearLayout.removeView(storeList);
-        //storeList.setEmptyView(empty);
         recycle.setVisibility(View.INVISIBLE);
 
     }
     // 設定
     private void setting() {
-        // 先把內容清空
-        //linearLayout.removeView(storeList);
-        //storeList.setEmptyView(empty);
         recycle.setVisibility(View.INVISIBLE);
 
     }
     // 說明
     private void info() {
-        // 先把內容清空
-        //linearLayout.removeView(storeList);
-        //storeList.setEmptyView(empty);
         recycle.setVisibility(View.INVISIBLE);
-        System.out.println(intro[2]);
-        System.out.println(name[2]);
 
     }
     // ↑↑↑↑↑↑↑↑↑↑↑要寫的↑↑↑↑↑↑↑↑↑↑↑
@@ -645,11 +642,16 @@ public class MainActivity extends AppCompatActivity {
                     storeArriveWay += jsonObj.getJSONObject(i).opt("arriveWay")+"\n";
                     storeCityName += jsonObj.getJSONObject(i).get("cityName")+"\n";
                     storeFacebook += jsonObj.getJSONObject(i).opt("facebook")+"\n";
-                    storeRepresentImage += jsonObj.getJSONObject(i).opt("representImage")+"\n";
+
+                    if(jsonObj.getJSONObject(i).opt("representImage") == null) {
+                        storeRepresentImage += "\n";
+                    }
+                    else {
+                        storeRepresentImage += jsonObj.getJSONObject(i).opt("representImage")+"\n";
+                    }
 
                     String temp = jsonObj.getJSONObject(i).opt("intro")+"";
                     String temp2 = temp.replace("\n", "");
-                    System.out.println(temp2);
                     if(temp2 == null || temp2 == "" || temp2 == "null" || jsonObj.getJSONObject(i).opt("intro") == null){
                         storeIntro += "無簡介"+"\n";
                     }
@@ -692,44 +694,59 @@ public class MainActivity extends AppCompatActivity {
 
     private void card() {
 
-        System.out.println(intro[2]);
-
-        ArrayList<String> myDataset = new ArrayList<>();
-        ArrayList<String> myDataset2 = new ArrayList<>();
+        ArrayList<String> myDataset = new ArrayList<>();    // 店名
+        ArrayList<String> myDataset2 = new ArrayList<>();   // 縣市
+        ArrayList<String> myDataset3 = new ArrayList<>();   // 地址
+        ArrayList<String> myDataset4 = new ArrayList<>();   // 營業時間
+        ArrayList<String> myDataset5 = new ArrayList<>();   // 圖片
 
         for(int i = 0; i < dataCount; i++){
             myDataset.add(name[i]);
-            myDataset2.add(intro[i]);
+            myDataset2.add(cityName[i]);
+            myDataset3.add(address[i]);
+            myDataset4.add(openTime[i]);
+            myDataset5.add(representImage[i]);
         }
 
-        MyAdapter myAdapter = new MyAdapter(myDataset, myDataset2);
-
+        MyAdapter myAdapter = new MyAdapter(myDataset, myDataset2, myDataset3, myDataset4, myDataset5);
         RecyclerView mList = (RecyclerView) findViewById(R.id.recycler_view);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mList.setLayoutManager(layoutManager);
         mList.setAdapter(myAdapter);
-
     }
-
 
     public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         private List<String> mData;
         private List<String> mData2;
+        private List<String> mData3;
+        private List<String> mData4;
+        private List<String> mData5;
 
         public class ViewHolder extends RecyclerView.ViewHolder {
             public TextView mainTitle;
-            public TextView infoTitle;
+            public TextView cityTitle;
+            public TextView addrTitle;
+            public TextView timeTitle;
+            public ImageView storeTitle;
+
+
             public ViewHolder(View v) {
                 super(v);
                 mainTitle = (TextView) v.findViewById(R.id.main);
-                infoTitle = (TextView) v.findViewById(R.id.info);
+                cityTitle = (TextView) v.findViewById(R.id.city);
+                addrTitle = (TextView) v.findViewById(R.id.addr);
+                timeTitle = (TextView) v.findViewById(R.id.time);
+                storeTitle = (ImageView) v.findViewById(R.id.store_image);
             }
         }
 
-        public MyAdapter(List<String> data, List<String> data2) {
+        public MyAdapter(List<String> data, List<String> data2, List<String> data3, List<String> data4, List<String> data5) {
             mData = data;
             mData2 = data2;
+            mData3 = data3;
+            mData4 = data4;
+            mData5 = data5;
         }
 
         @Override
@@ -742,7 +759,19 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
             holder.mainTitle.setText(mData.get(position));
-            holder.infoTitle.setText(mData2.get(position));
+            holder.cityTitle.setText(mData2.get(position));
+            holder.addrTitle.setText(mData3.get(position));
+            holder.timeTitle.setText(mData4.get(position));
+
+            //new DownloadImageTask(holder.storeTitle).execute(mData5.get(position));
+
+            if(mData5.get(position) == null || mData5.get(position) == "null" || mData5.get(position).isEmpty()) {
+                Picasso.with(MainActivity.this).load(R.drawable.bookstore).into(holder.storeTitle);
+            }
+            else {
+                Picasso.with(MainActivity.this).load(mData5.get(position)).fit().centerCrop().into(holder.storeTitle);
+            }
+
         }
 
         @Override
@@ -751,6 +780,36 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // inner class
+    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+        ImageView bmImage;
+
+        public DownloadImageTask(ImageView bmImage) {
+            this.bmImage = bmImage;
+        }
+
+        protected Bitmap doInBackground(String... urls) {
+            String urldisplay = urls[0];
+
+            Bitmap mIcon11 = null;
+            try {
+                InputStream in = new java.net.URL(urldisplay).openStream();
+                mIcon11 = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
+            }
+            return mIcon11;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            Bitmap.createScaledBitmap(result, 100, 100, false);
+
+
+            bmImage.setImageBitmap(result);
+        }
+    }
+    // end inner class
 
 
 }
