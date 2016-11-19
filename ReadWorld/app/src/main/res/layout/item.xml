@@ -15,22 +15,8 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="120dp"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/main"
-            android:layout_height="wrap_content"
-            android:textSize="20sp"
-            android:text="店名"
-            android:padding="5dp"
-            android:ellipsize="end"
-            android:lines="1"
-            android:layout_marginLeft="4dp"
-            android:layout_marginRight="4dp"
-            android:layout_marginTop="3dp"
-            android:layout_width="220dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true" />
+        android:orientation="vertical"
+        android:id="@+id/cardRelative">
 
         <TextView
             android:text="縣市"
@@ -77,6 +63,20 @@
             android:layout_alignParentStart="true"
             android:layout_marginStart="15dp"
             android:scaleType="fitStart"/>
+
+        <TextView
+            android:id="@+id/main"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:text="店名"
+            android:padding="5dp"
+            android:ellipsize="end"
+            android:lines="1"
+            android:layout_marginLeft="4dp"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/store_image"
+            android:layout_marginStart="15dp"
+            android:layout_width="180dp" />
 
 
     </RelativeLayout>

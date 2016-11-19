@@ -34,12 +34,14 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -77,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
     DrawerLayout drawerLayout;
     TextView nameOrGuest;               // 有登入顯示姓名, 否則顯示 "訪客"
     TextView emailOrSignIn;             // 有登入顯示email, 否則顯示 "點這裡登入"
-    ImageView profilePic;               // 頭像
+    ImageView profilePic;               // 頭像;
 
     // for  dynamic view, 動態新增物件在main裡
     LinearLayout linearLayout;          // 外面大框框 (從這個view丟進去)
@@ -206,7 +208,7 @@ public class MainActivity extends AppCompatActivity {
             nameOrGuest.setText(userName);
             emailOrSignIn.setText(userEmail);
             if (photoString != null) { // 如果有照片
-                Picasso.with(this.getApplicationContext()).load(photoString).into(profilePic);
+                Picasso.with(this.getApplicationContext()).load(photoString).fit().centerCrop().into(profilePic);
             }
         }
         // 從SharedPreferences找
@@ -217,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
                 nameOrGuest.setText(userName);
                 emailOrSignIn.setText(userEmail);
                 if (photoString != null) { // 如果有照片
-                    Picasso.with(this.getApplicationContext()).load(photoString).into(profilePic);
+                    Picasso.with(this.getApplicationContext()).load(photoString).fit().centerCrop().into(profilePic);
                 }
             }
             else { // 找不到資料的話, 就是訪客了
@@ -336,7 +338,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         navigateTo(view.getMenu().findItem(navItemId));
-
 
     } // [END onCreate]
 
@@ -591,6 +592,7 @@ public class MainActivity extends AppCompatActivity {
         recycle.setVisibility(View.INVISIBLE);
 
     }
+
     // ↑↑↑↑↑↑↑↑↑↑↑要寫的↑↑↑↑↑↑↑↑↑↑↑
 
     // [START inner class] 背景運行
@@ -600,7 +602,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onPreExecute() {
             //執行前 設定可以在這邊設定
             super.onPreExecute();
-            Toast.makeText(getApplicationContext(), "更新中~~", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(), "更新中~~", Toast.LENGTH_SHORT).show();
         }
 
         @Override
@@ -716,6 +718,7 @@ public class MainActivity extends AppCompatActivity {
         mList.setAdapter(myAdapter);
     }
 
+    // inner class
     public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         private List<String> mData;
         private List<String> mData2;
@@ -724,6 +727,8 @@ public class MainActivity extends AppCompatActivity {
         private List<String> mData5;
 
         public class ViewHolder extends RecyclerView.ViewHolder {
+
+            public RelativeLayout cardrelative;
             public TextView mainTitle;
             public TextView cityTitle;
             public TextView addrTitle;
@@ -733,6 +738,7 @@ public class MainActivity extends AppCompatActivity {
 
             public ViewHolder(View v) {
                 super(v);
+                cardrelative = (RelativeLayout) v.findViewById(R.id.cardRelative);
                 mainTitle = (TextView) v.findViewById(R.id.main);
                 cityTitle = (TextView) v.findViewById(R.id.city);
                 addrTitle = (TextView) v.findViewById(R.id.addr);
@@ -757,7 +763,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onBindViewHolder(ViewHolder holder, int position) {
+        public void onBindViewHolder(ViewHolder holder, final int position) {
             holder.mainTitle.setText(mData.get(position));
             holder.cityTitle.setText(mData2.get(position));
             holder.addrTitle.setText(mData3.get(position));
@@ -772,6 +778,38 @@ public class MainActivity extends AppCompatActivity {
                 Picasso.with(MainActivity.this).load(mData5.get(position)).fit().centerCrop().into(holder.storeTitle);
             }
 
+            // 按卡片觸發的事件
+            holder.cardrelative.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //Toast.makeText(MainActivity.this, (position+1)+" pressed", Toast.LENGTH_SHORT).show();
+
+                    Intent intent = new Intent();
+                    intent.setClass(MainActivity.this, StoreInfoActivity.class);
+
+                    Bundle bundle = new Bundle();
+                    bundle.putStringArray("name", name);
+                    bundle.putStringArray("representImage", representImage);
+                    bundle.putStringArray("intro", intro);
+                    bundle.putStringArray("cityName", cityName);
+                    bundle.putStringArray("address", address);
+                    bundle.putStringArray("longitude", longitude);
+                    bundle.putStringArray("latitude", latitude);
+                    bundle.putStringArray("openTime", openTime);
+                    bundle.putStringArray("phone", phone);
+                    bundle.putStringArray("email", email);
+                    bundle.putStringArray("facebook", facebook);
+                    bundle.putStringArray("website", website);
+                    bundle.putStringArray("arriveWay", arriveWay);
+                    bundle.putInt("index", position);
+
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+
+                    overridePendingTransition(R.anim.left_in_2, R.anim.left_out_2);
+                }
+            });
+
         }
 
         @Override
@@ -780,36 +818,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // inner class
-    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-        ImageView bmImage;
-
-        public DownloadImageTask(ImageView bmImage) {
-            this.bmImage = bmImage;
-        }
-
-        protected Bitmap doInBackground(String... urls) {
-            String urldisplay = urls[0];
-
-            Bitmap mIcon11 = null;
-            try {
-                InputStream in = new java.net.URL(urldisplay).openStream();
-                mIcon11 = BitmapFactory.decodeStream(in);
-            } catch (Exception e) {
-                Log.e("Error", e.getMessage());
-                e.printStackTrace();
-            }
-            return mIcon11;
-        }
-
-        protected void onPostExecute(Bitmap result) {
-            Bitmap.createScaledBitmap(result, 100, 100, false);
-
-
-            bmImage.setImageBitmap(result);
-        }
-    }
-    // end inner class
 
 
 }

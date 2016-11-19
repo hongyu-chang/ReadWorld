@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/store_info"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.user.readworld.StoreInfoActivity"
+    android:fitsSystemWindows="false">
+
+    <ImageView
+        android:layout_width="match_parent"
+        app:srcCompat="@color/cast_expanded_controller_ad_label_background_color"
+        android:id="@+id/imageView"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_height="250dp"
+        android:src="@drawable/bookstore"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="380dp"
+        android:layout_below="@+id/imageView"
+        android:layout_alignParentStart="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:text="名稱"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="15dp"
+                android:id="@+id/title"
+                android:textSize="27sp"
+                android:textStyle="bold"
+                android:layout_width="300dp" />
+
+            <TextView
+                android:text="簡介"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/title"
+                android:layout_marginStart="15dp"
+                android:id="@+id/introTitle"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:text="簡介內容"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/introTitle"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:textSize="16sp"
+                android:id="@+id/introContent"/>
+
+            <TextView
+                android:text="縣市"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/introContent"
+                android:layout_marginStart="15dp"
+                android:id="@+id/cityTitle"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:text="縣市內容"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/cityTitle"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:textSize="16sp"
+                android:id="@+id/cityContent"/>
+
+            <TextView
+                android:text="地址"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/cityContent"
+                android:layout_marginStart="15dp"
+                android:id="@+id/addressTitle"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:text="地址內容"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/addressTitle"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:textSize="16sp"
+                android:id="@+id/addressContent"/>
+
+            <TextView
+                android:text="開放時間"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/addressContent"
+                android:layout_marginStart="15dp"
+                android:id="@+id/timeTitle"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:text="開放時間內容"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/timeTitle"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:textSize="16sp"
+                android:id="@+id/timeContent"/>
+
+            <TextView
+                android:text="電話"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/timeContent"
+                android:layout_marginStart="15dp"
+                android:id="@+id/phoneTitle"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:text="電話內容"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/phoneTitle"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:textSize="16sp"
+                android:id="@+id/phoneContent"/>
+
+            <TextView
+                android:text="如何到達"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/phoneContent"
+                android:layout_marginStart="15dp"
+                android:id="@+id/arriveTitle"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:text="如何到達內容"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/arriveTitle"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:textSize="16sp"
+                android:id="@+id/arriveContent"/>
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                app:srcCompat="@drawable/star0"
+                android:id="@+id/star"
+                android:layout_marginRight="10dp"
+                android:layout_alignBottom="@+id/title"
+                android:layout_toEndOf="@+id/title"/>
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+</RelativeLayout>
