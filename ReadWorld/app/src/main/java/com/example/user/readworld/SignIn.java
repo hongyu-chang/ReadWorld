@@ -3,6 +3,7 @@ package com.example.user.readworld;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.service.notification.StatusBarNotification;
@@ -56,6 +57,9 @@ public class SignIn extends AppCompatActivity implements GoogleApiClient.OnConne
 
     private static Boolean isExit = false;
     private static Boolean hasTask = false;
+
+    // Databases
+    private DBHelper profile = null;
 
     // 自動播放圖片(目前10張)
     private int[] resid = {R.drawable.a01, R.drawable.a02, R.drawable.a03, R.drawable.a04, R.drawable.a05, R.drawable.a06, R.drawable.a07, R.drawable.a08, R.drawable.a09, R.drawable.a10};
@@ -114,7 +118,6 @@ public class SignIn extends AppCompatActivity implements GoogleApiClient.OnConne
         googleLogin.setSize(SignInButton.SIZE_WIDE);
         googleLogin.setScopes(signInOptions.getScopeArray());
 
-
         // [START googleLogIn]
         googleLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -125,7 +128,6 @@ public class SignIn extends AppCompatActivity implements GoogleApiClient.OnConne
         });
         // [END googleLogIn]
 
-
         // [START guestLogIn]
         guestButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -135,6 +137,7 @@ public class SignIn extends AppCompatActivity implements GoogleApiClient.OnConne
                 // 進入下一個activity
                 Intent intent = new Intent();
                 intent.setClass(SignIn.this, MainActivity.class);
+                intent.putExtra("id", 0);
                 startActivity(intent);
                 SignIn.this.finish();
             }
@@ -142,7 +145,6 @@ public class SignIn extends AppCompatActivity implements GoogleApiClient.OnConne
         // [END guestLogIn]
 
     } // [END onCreate]
-
 
     // [START onActivityResult] 登入google後
     @Override
@@ -154,11 +156,17 @@ public class SignIn extends AppCompatActivity implements GoogleApiClient.OnConne
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             GoogleSignInAccount account = result.getSignInAccount();
 
-            String name = account.getDisplayName(); // 姓名
-            String email = account.getEmail();      // 信箱
-            String id = account.getId();            // *使用id來記錄, 辨識user
+            name = account.getDisplayName(); // 姓名
+            email = account.getEmail();      // 信箱
+            id = account.getId();            // *使用id來記錄, 辨識user
             Uri photoImage = account.getPhotoUrl(); // 個人相片
-            String photoString = String.valueOf(photoImage);
+            photoString = String.valueOf(photoImage);
+
+            // 存進資料庫
+            profile = new DBHelper(this);
+            SQLiteDatabase db = profile.getWritableDatabase();
+            profile.addInProfile(id, name, email, photoString, db);
+            //
 
             // 設定檔, 下次開啟會跳過此activity
             saveSetting();
@@ -193,19 +201,24 @@ public class SignIn extends AppCompatActivity implements GoogleApiClient.OnConne
     private void saveSetting() {
         SharedPreferences setting = getSharedPreferences("profile_info", 0);
         setting.edit().putBoolean("isFirst", false).commit();
-        setting.edit().putString("id", null).commit();
-        setting.edit().putString("name", null).commit();
-        setting.edit().putString("email", null).commit();
-        setting.edit().putString("photoUri", null).commit();
+        //setting.edit().putString("id", null).commit();
+        //setting.edit().putString("name", null).commit();
+        //setting.edit().putString("email", null).commit();
+        //setting.edit().putString("photoUri", null).commit();
     } // [END saveSetting]
 
     // [START readSetting] 讀取設定狀態
     private void readSetting() {
         SharedPreferences setting = getSharedPreferences("profile_info", 0);
         boolean isFirst = setting.getBoolean("isFirst", true);
+        //String id = setting.getString("id", "0");
         if(!isFirst) {
 
             Intent intent = new Intent();
+            intent.putExtra("name", name);
+            intent.putExtra("email", email);
+            intent.putExtra("id", id);
+            intent.putExtra("photoString", photoString);
             intent.setClass(SignIn.this, MainActivity.class);
             startActivity(intent);
             SignIn.this.finish();
@@ -244,9 +257,7 @@ public class SignIn extends AppCompatActivity implements GoogleApiClient.OnConne
         return true;
     }
 
-
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
     }
 }

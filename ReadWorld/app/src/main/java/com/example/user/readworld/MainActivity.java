@@ -213,6 +213,7 @@ public class MainActivity extends AppCompatActivity {
         }
         // 從SharedPreferences找
         // 重開app, 資料會存在SharedPreferences, 而"接收google帳戶資訊"會沒資料, 所以要從SharedPreferences找
+
         else {
             readSetting();
             if (id != null) {
@@ -229,6 +230,7 @@ public class MainActivity extends AppCompatActivity {
                 signOutOption.setVisible(false);        // 沒有登出選項(因為沒登入)
             }
         }
+
 
 
         // 點這裡登入
@@ -775,7 +777,7 @@ public class MainActivity extends AppCompatActivity {
                 Picasso.with(MainActivity.this).load(R.drawable.bookstore).into(holder.storeTitle);
             }
             else {
-                Picasso.with(MainActivity.this).load(mData5.get(position)).fit().centerCrop().into(holder.storeTitle);
+                Picasso.with(MainActivity.this).load(mData5.get(position)).error(R.drawable.bookstore).placeholder(R.drawable.bookstore).fit().centerCrop().into(holder.storeTitle);
             }
 
             // 按卡片觸發的事件
@@ -802,6 +804,7 @@ public class MainActivity extends AppCompatActivity {
                     bundle.putStringArray("website", website);
                     bundle.putStringArray("arriveWay", arriveWay);
                     bundle.putInt("index", position);
+                    bundle.putString("id", id);
 
                     intent.putExtras(bundle);
                     startActivity(intent);
