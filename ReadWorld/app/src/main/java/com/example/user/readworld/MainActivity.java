@@ -9,6 +9,10 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -46,6 +50,8 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
 import com.jaeger.library.StatusBarUtil;
 import com.squareup.picasso.Picasso;
 
@@ -59,11 +65,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -140,17 +142,33 @@ public class MainActivity extends AppCompatActivity {
     // 和定位有關的
     private LocationManager mLocationManager;
 
+    private SensorManager mSensorManager;       // 體感(Sensor)使用管理
+    private Sensor mSensor;                     // 體感(Sensor)類別
+    private float mLastX;                       // x軸體感(Sensor)偏移
+    private float mLastY;                       // y軸體感(Sensor)偏移
+    private float mLastZ;                       // z軸體感(Sensor)偏移
+    private double mSpeed;                      // 甩動力道數度
+    private long mLastUpdateTime;               // 觸發時間
+    private boolean goToUp = false;
+
+    //甩動力道數度設定值 (數值越大需甩動越大力，數值越小輕輕甩動即會觸發)
+    private static final int SPEED_SHRESHOLD = 3000;
+
+    //觸發間隔時間
+    private static final int UPTATE_INTERVAL_TIME = 70;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         linearLayout = (LinearLayout) findViewById(R.id.linearlayout);
-        recycle = (RecyclerView) findViewById(R.id.recycler_view);
+        //recycle = (RecyclerView) findViewById(R.id.recycler_view);
+        recycle = new RecyclerView(this);
         card = (CardView) findViewById(R.id.card_view);
         //storeList = new ListView(this); // 目前不使用listview, 用cardview
 
-        empty = new TextView(this); // 清空的
+        //empty = new TextView(this); // 清空的
 
         // 下拉重新整理(還沒做...)
         /*
@@ -341,7 +359,83 @@ public class MainActivity extends AppCompatActivity {
 
         navigateTo(view.getMenu().findItem(navItemId));
 
+
+        //取得體感(Sensor)服務使用權限
+        mSensorManager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE);
+
+        //取得手機Sensor狀態設定
+        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+        //註冊體感(Sensor)甩動觸發Listener
+        mSensorManager.registerListener(SensorListener, mSensor,SensorManager.SENSOR_DELAY_GAME);
+
+
     } // [END onCreate]
+
+    private SensorEventListener SensorListener = new SensorEventListener()
+    {
+        public void onSensorChanged(SensorEvent mSensorEvent)
+        {
+            //當前觸發時間
+            long mCurrentUpdateTime = System.currentTimeMillis();
+
+            //觸發間隔時間 = 當前觸發時間 - 上次觸發時間
+            long mTimeInterval = mCurrentUpdateTime - mLastUpdateTime;
+
+            //若觸發間隔時間< 70 則return;
+            if (mTimeInterval < UPTATE_INTERVAL_TIME) return;
+
+            mLastUpdateTime = mCurrentUpdateTime;
+
+            //取得xyz體感(Sensor)偏移
+            float x = mSensorEvent.values[0];
+            float y = mSensorEvent.values[1];
+            float z = mSensorEvent.values[2];
+
+            //甩動偏移速度 = xyz體感(Sensor)偏移 - 上次xyz體感(Sensor)偏移
+            float mDeltaX = x - mLastX;
+            float mDeltaY = y - mLastY;
+            float mDeltaZ = z - mLastZ;
+
+            mLastX = x;
+            mLastY = y;
+            mLastZ = z;
+
+            //體感(Sensor)甩動力道速度公式
+            mSpeed = Math.sqrt(mDeltaX * mDeltaX + mDeltaY * mDeltaY + mDeltaZ * mDeltaZ)/ mTimeInterval * 10000;
+
+            //若體感(Sensor)甩動速度大於等於甩動設定值則進入 (達到甩動力道及速度)
+            if (mSpeed >= SPEED_SHRESHOLD)
+            {
+                //達到搖一搖甩動後要做的事情
+                if(goToUp == true) {
+                    recycle.smoothScrollToPosition(0);
+                    goToUp = false;
+                }
+                else {
+                    recycle.smoothScrollToPosition(name.length);
+                    goToUp = true;
+                }
+
+                Log.d("TAG","搖一搖中...");
+            }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+        }
+
+    };
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        //在程式關閉時移除體感(Sensor)觸發
+        mSensorManager.unregisterListener(SensorListener);
+    }
+
 
     // 跟按兩下關閉有關
     Timer timerExit = new Timer();
@@ -508,13 +602,26 @@ public class MainActivity extends AppCompatActivity {
 
     // 總覽
     private void overview() {
-        recycle.setVisibility(View.VISIBLE);
+        // 先移除所有的動態view
+        linearLayout.removeView(recycle);
+        /*
+        *
+        *
+        */
 
+
+        // 再新增自己的view
+        linearLayout.addView(recycle);
     }
 
     // 附近的店家
     private void nearby() {
-        recycle.setVisibility(View.INVISIBLE);
+        // 先移除所有的動態view
+        linearLayout.removeView(recycle);
+        /*
+        *
+        *
+        */
 
 
         //取得系統定位服務
@@ -575,23 +682,64 @@ public class MainActivity extends AppCompatActivity {
 
     // 地圖
     private void map() {
-        recycle.setVisibility(View.INVISIBLE);
+        // 先移除所有的動態view
+        linearLayout.removeView(recycle);
+        /*
+        *
+        *
+        */
 
+        Intent intent = new Intent();
+        intent.setClass(MainActivity.this, MapsActivity.class);
+
+
+        Bundle bundle = new Bundle();
+        bundle.putStringArray("name", name);
+        bundle.putStringArray("cityName", cityName);
+        bundle.putStringArray("address", address);
+        bundle.putStringArray("longitude", longitude);
+        bundle.putStringArray("latitude", latitude);
+
+
+        intent.putExtras(bundle);
+        startActivity(intent);
+
+        overridePendingTransition(R.anim.left_in_2, R.anim.left_out_2);
+
+
+        //MapsActivity ma = new MapsActivity();
+        //MapsInitializer.initialize(ma);
+        //ma.onCreate(bundle);
 
     }
     // 我的最愛
     private void myFavorite() {
-        recycle.setVisibility(View.INVISIBLE);
+        // 先移除所有的動態view
+        linearLayout.removeView(recycle);
+        /*
+        *
+        *
+        */
 
     }
     // 設定
     private void setting() {
-        recycle.setVisibility(View.INVISIBLE);
+        // 先移除所有的動態view
+        linearLayout.removeView(recycle);
+        /*
+        *
+        *
+        */
 
     }
     // 說明
     private void info() {
-        recycle.setVisibility(View.INVISIBLE);
+        // 先移除所有的動態view
+        linearLayout.removeView(recycle);
+        /*
+        *
+        *
+        */
 
     }
 
@@ -713,11 +861,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         MyAdapter myAdapter = new MyAdapter(myDataset, myDataset2, myDataset3, myDataset4, myDataset5);
-        RecyclerView mList = (RecyclerView) findViewById(R.id.recycler_view);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        mList.setLayoutManager(layoutManager);
-        mList.setAdapter(myAdapter);
+        recycle.setLayoutManager(layoutManager);
+        recycle.setAdapter(myAdapter);
+
+        linearLayout.addView(recycle);
     }
 
     // inner class
