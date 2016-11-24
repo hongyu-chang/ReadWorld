@@ -7,6 +7,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Sensor;
@@ -78,6 +80,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback{
 
+    SearchView searchView;
     GoogleMap mMap;
     DrawerLayout drawerLayout;
     TextView nameOrGuest;               // 有登入顯示姓名, 否則顯示 "訪客"
@@ -91,6 +94,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     SwipeRefreshLayout refresh;         // 下滑重新整理(還沒做)
     CardView card;                      // 用卡片的方式來列出所有書店
     RecyclerView recycle;               // 卡片要裝進這個view來顯示
+    RecyclerView recycle2;              // 搜尋用recycle
+    RecyclerView recycle3;
 
     // for google user information, google登入後的資訊
     String userName;                    // 使用者姓名
@@ -163,9 +168,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        searchView = new SearchView(this);
         linearLayout = (LinearLayout) findViewById(R.id.linearlayout);
         //recycle = (RecyclerView) findViewById(R.id.recycler_view);
         recycle = new RecyclerView(this);
+        recycle2 = new RecyclerView(this);
+        recycle3 = new RecyclerView(this);
         card = (CardView) findViewById(R.id.card_view);
         //storeList = new ListView(this); // 目前不使用listview, 用cardview
 
@@ -289,26 +297,33 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 switch (menuItem.getItemId()) {
                     case R.id.overview:
                         toolbar.setTitle(R.string.overview);
+                        menuItem.setChecked(true);
                         overview();
                         break;
                     case R.id.map:
-                        toolbar.setTitle(R.string.map);
+                        //toolbar.setTitle(R.string.map);
+                        menuItem.setChecked(false);
+                        menuItem.setCheckable(false);
                         map();
                         break;
                     case R.id.myFavorites:
                         toolbar.setTitle(R.string.myFavorites);
+                        menuItem.setChecked(true);
                         myFavorite();
                         break;
                     case R.id.setting:
                         toolbar.setTitle(R.string.setting);
+                        menuItem.setChecked(true);
                         setting();
                         break;
                     case R.id.info:
                         toolbar.setTitle(R.string.info);
+                        menuItem.setChecked(true);
                         info();
                         break;
                     case R.id.signOut:
                         toolbar.setTitle(R.string.signOut);
+                        menuItem.setChecked(true);
                         signOut();
                         break;
                     case R.id.exit:
@@ -454,6 +469,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             if(drawerLayout.isDrawerOpen(GravityCompat.START)) {
                 drawerLayout.closeDrawers();
             }
+            else if(!searchView.isIconified()){
+                searchView.setIconified(true);
+            }
             // 如果沒開啟就是要退出app
             else {
                 // 是否要退出
@@ -485,7 +503,66 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Get the SearchView and set the searchable configuration
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menuSearchItem.getActionView();
+        final SearchView searchView = (SearchView) menuSearchItem.getActionView();
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                //Toast.makeText(MainActivity.this,query,Toast.LENGTH_SHORT).show();
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+
+                linearLayout.removeView(recycle);
+                linearLayout.removeView(recycle2);
+
+                int count = 0;
+                ArrayList<String> a = new ArrayList<>();   // 店名
+                ArrayList<String> b = new ArrayList<>();   // 縣市
+                ArrayList<String> c = new ArrayList<>();   // 地址
+                ArrayList<String> d = new ArrayList<>();   // 營業時間
+                ArrayList<String> e = new ArrayList<>();   // 圖片
+
+                for(int i = 0; i < name.length; i++) {
+                    if(!newText.isEmpty()) {
+                        if(name[i].indexOf(newText) != -1 || cityName[i].indexOf(newText) != -1 || address[i].indexOf(newText) != -1) {
+                            a.add(name[i]);
+                            b.add(cityName[i]);
+                            c.add(address[i]);
+                            d.add(openTime[i]);
+                            e.add(representImage[i]);
+                            count++;
+                            //Toast.makeText(MainActivity.this,name[i],Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+
+                MyAdapter myAdapter = new MyAdapter(a, b, c, d, e);
+                final LinearLayoutManager layoutManager = new LinearLayoutManager(MainActivity.this);
+                layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+                recycle2.setLayoutManager(layoutManager);
+                recycle2.setAdapter(myAdapter);
+
+                linearLayout.addView(recycle2);
+
+                return false;
+            }
+        });
+
+        searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!hasFocus) {
+                    linearLayout.removeView(recycle2);
+                    linearLayout.removeView(recycle);
+                    linearLayout.addView(recycle);
+                    searchView.setIconified(true);
+                }
+
+            }
+        });
 
         // Assumes current activity is the searchable activity
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
@@ -601,6 +678,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void overview() {
         // 先移除所有的動態view
         linearLayout.removeView(recycle);
+        linearLayout.removeView(recycle2);
+        linearLayout.removeView(recycle3);
         /*
         *
         *
@@ -613,15 +692,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     // todo 地圖
     private void map() {
         // 先移除所有的動態view
-        linearLayout.removeView(recycle);
-        /*
-        *
-        *
-
+        //linearLayout.removeView(recycle);
+        //linearLayout.removeView(recycle2);
 
         Intent intent = new Intent();
         intent.setClass(MainActivity.this, MapsActivity.class);
-
 
         Bundle bundle = new Bundle();
         bundle.putStringArray("name", name);
@@ -630,21 +705,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         bundle.putStringArray("longitude", longitude);
         bundle.putStringArray("latitude", latitude);
 
-
         intent.putExtras(bundle);
         startActivity(intent);
-        */
+        overridePendingTransition(R.anim.left_in_2, R.anim.left_out_2);
+
+        /*
         setContentView(R.layout.activity_maps);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         overridePendingTransition(R.anim.left_in_2, R.anim.left_out_2);
+        */
 
 
         //MapsActivity ma = new MapsActivity();
         //MapsInitializer.initialize(ma);
         //ma.onCreate(bundle);
-
     }
 
     @Override
@@ -690,17 +766,62 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void myFavorite() {
         // 先移除所有的動態view
         linearLayout.removeView(recycle);
-        /*
+        linearLayout.removeView(recycle2);
+        linearLayout.removeView(recycle3);
+        /* TODO
         *
         *
         */
+
+        DBHelper myFavorites = new DBHelper(this);
+        SQLiteDatabase db = myFavorites.getWritableDatabase();
+
+        ArrayList<String> a = new ArrayList<>();   // 店名
+        ArrayList<String> b = new ArrayList<>();   // 縣市
+        ArrayList<String> c = new ArrayList<>();   // 地址
+        ArrayList<String> d = new ArrayList<>();   // 營業時間
+        ArrayList<String> e = new ArrayList<>();   // 圖片
+
+        Cursor cr = db.rawQuery("SELECT * FROM " + myFavorites.myFavoritesTableName, null);
+
+        // 沒有資料表示沒有任何一家加入最愛過
+        if(cr.getCount() == 0) {
+            //Toast.makeText(StoreInfoActivity.this, "沒資料QQ", Toast.LENGTH_SHORT).show();
+        }
+
+        //
+        else {
+            cr.moveToFirst();
+            do {
+                int index = cr.getInt(2);
+                a.add(name[index]);
+                b.add(cityName[index]);
+                c.add(address[index]);
+                d.add(openTime[index]);
+                e.add(representImage[index]);
+
+            } while(cr.moveToNext());
+
+
+            MyAdapter myAdapter = new MyAdapter(a, b, c, d, e);
+            final LinearLayoutManager layoutManager = new LinearLayoutManager(MainActivity.this);
+            layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+            recycle3.setLayoutManager(layoutManager);
+            recycle3.setAdapter(myAdapter);
+
+            linearLayout.addView(recycle3);
+
+        }
+
+
+
 
     }
     // 設定
     private void setting() {
         // 先移除所有的動態view
         linearLayout.removeView(recycle);
-        /*
+        /* TODO
         *
         *
         */
@@ -710,7 +831,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void info() {
         // 先移除所有的動態view
         linearLayout.removeView(recycle);
-        /*
+        /* TODO
         *
         *
         */
