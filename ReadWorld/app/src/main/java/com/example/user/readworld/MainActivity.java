@@ -34,6 +34,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.Spannable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -44,6 +45,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -508,25 +510,30 @@ public class MainActivity extends AppCompatActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                //Toast.makeText(MainActivity.this,query,Toast.LENGTH_SHORT).show();
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
 
-                linearLayout.removeView(recycle);
-                linearLayout.removeView(recycle2);
+                if(newText.isEmpty()) {
+                    linearLayout.removeView(recycle);
+                    linearLayout.removeView(recycle2);
+                    linearLayout.addView(recycle);
+                }
+                else {
+                    linearLayout.removeView(recycle);
+                    linearLayout.removeView(recycle2);
 
-                int count = 0;
-                ArrayList<String> a = new ArrayList<>();   // 店名
-                ArrayList<String> b = new ArrayList<>();   // 縣市
-                ArrayList<String> c = new ArrayList<>();   // 地址
-                ArrayList<String> d = new ArrayList<>();   // 營業時間
-                ArrayList<String> e = new ArrayList<>();   // 圖片
+                    int count = 0;
+                    ArrayList<String> a = new ArrayList<>();   // 店名
+                    ArrayList<String> b = new ArrayList<>();   // 縣市
+                    ArrayList<String> c = new ArrayList<>();   // 地址
+                    ArrayList<String> d = new ArrayList<>();   // 營業時間
+                    ArrayList<String> e = new ArrayList<>();   // 圖片
 
-                for(int i = 0; i < name.length; i++) {
-                    if(!newText.isEmpty()) {
+                    for(int i = 0; i < name.length; i++) {
+
                         if(name[i].indexOf(newText) != -1 || cityName[i].indexOf(newText) != -1 || address[i].indexOf(newText) != -1) {
                             a.add(name[i]);
                             b.add(cityName[i]);
@@ -537,15 +544,15 @@ public class MainActivity extends AppCompatActivity {
                             //Toast.makeText(MainActivity.this,name[i],Toast.LENGTH_SHORT).show();
                         }
                     }
+
+                    MyAdapter myAdapter = new MyAdapter(a, b, c, d, e);
+                    final LinearLayoutManager layoutManager = new LinearLayoutManager(MainActivity.this);
+                    layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+                    recycle2.setLayoutManager(layoutManager);
+                    recycle2.setAdapter(myAdapter);
+
+                    linearLayout.addView(recycle2);
                 }
-
-                MyAdapter myAdapter = new MyAdapter(a, b, c, d, e);
-                final LinearLayoutManager layoutManager = new LinearLayoutManager(MainActivity.this);
-                layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-                recycle2.setLayoutManager(layoutManager);
-                recycle2.setAdapter(myAdapter);
-
-                linearLayout.addView(recycle2);
 
                 return false;
             }
@@ -572,19 +579,6 @@ public class MainActivity extends AppCompatActivity {
 
         return true;
     }
-
-    // 點右上角的功能 可能砍掉
-    /*
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        return super.onOptionsItemSelected(item);
-    }
-    */
 
     private void navigateTo(MenuItem menuItem) {
         //contentView.setText(menuItem.getTitle());
@@ -672,8 +666,6 @@ public class MainActivity extends AppCompatActivity {
         linearLayout.addView(storeList);
     }
 
-    // ↓↓↓↓↓↓↓↓↓↓↓要寫的↓↓↓↓↓↓↓↓↓↓↓
-
     // 總覽
     private void overview() {
         // 先移除所有的動態view
@@ -709,20 +701,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
         overridePendingTransition(R.anim.left_in_2, R.anim.left_out_2);
 
-        /*
-        setContentView(R.layout.activity_maps);
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-        overridePendingTransition(R.anim.left_in_2, R.anim.left_out_2);
-        */
-
-
-        //MapsActivity ma = new MapsActivity();
-        //MapsInitializer.initialize(ma);
-        //ma.onCreate(bundle);
     }
-
     // 我的最愛
     private void myFavorite() {
         // 先移除所有的動態view
@@ -798,8 +777,6 @@ public class MainActivity extends AppCompatActivity {
         */
 
     }
-
-    // ↑↑↑↑↑↑↑↑↑↑↑要寫的↑↑↑↑↑↑↑↑↑↑↑
 
     // [START inner class] 背景運行
     class JsonParse extends AsyncTask<String , Integer , String> {
@@ -975,6 +952,7 @@ public class MainActivity extends AppCompatActivity {
             holder.cityTitle.setText(mData2.get(position));
             holder.addrTitle.setText(mData3.get(position));
             holder.timeTitle.setText(mData4.get(position));
+            //holder.mainTitle.setTextColor(R.color.material_blue_grey_800);
 
             //new DownloadImageTask(holder.storeTitle).execute(mData5.get(position));
 
@@ -1035,7 +1013,5 @@ public class MainActivity extends AppCompatActivity {
             return mData.size();
         }
     }
-
-
 
 }
