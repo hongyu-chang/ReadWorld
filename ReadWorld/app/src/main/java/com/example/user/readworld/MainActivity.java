@@ -76,8 +76,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import android.support.v4.widget.SwipeRefreshLayout;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback{
 
+    GoogleMap mMap;
     DrawerLayout drawerLayout;
     TextView nameOrGuest;               // 有登入顯示姓名, 否則顯示 "訪客"
     TextView emailOrSignIn;             // 有登入顯示email, 否則顯示 "點這裡登入"
@@ -680,14 +681,14 @@ public class MainActivity extends AppCompatActivity {
     };
 
 
-    // 地圖
+    // todo 地圖
     private void map() {
         // 先移除所有的動態view
         linearLayout.removeView(recycle);
         /*
         *
         *
-        */
+
 
         Intent intent = new Intent();
         intent.setClass(MainActivity.this, MapsActivity.class);
@@ -703,7 +704,11 @@ public class MainActivity extends AppCompatActivity {
 
         intent.putExtras(bundle);
         startActivity(intent);
-
+        */
+        setContentView(R.layout.activity_maps);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
         overridePendingTransition(R.anim.left_in_2, R.anim.left_out_2);
 
 
@@ -712,6 +717,46 @@ public class MainActivity extends AppCompatActivity {
         //ma.onCreate(bundle);
 
     }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        mMap.setMyLocationEnabled(true);
+        mMap.setBuildingsEnabled(true);
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        mMap.getUiSettings().setIndoorLevelPickerEnabled(true);
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.getUiSettings().setCompassEnabled(true);
+        mMap.getUiSettings().setMyLocationButtonEnabled(true);
+        mMap.getUiSettings().setMapToolbarEnabled(true);
+        mMap.getFocusedBuilding();
+
+        // Add  markers
+        List<LatLng> points = new ArrayList<LatLng>();
+
+        for(int i = 0; i < longitude.length; i++) {
+            if(latitude[i].isEmpty() || longitude[i].isEmpty()) {
+                points.add(new LatLng(0, 0));
+            }
+            else {
+                points.add(new LatLng(Double.valueOf(latitude[i]), Double.valueOf(longitude[i])));
+                mMap.addMarker(new MarkerOptions().position(points.get(i)).draggable(true).title(name[i]).snippet(address[i]));
+            }
+        }
+        mMap.animateCamera(CameraUpdateFactory.newLatLng(points.get(0)));
+    }
+
     // 我的最愛
     private void myFavorite() {
         // 先移除所有的動態view
