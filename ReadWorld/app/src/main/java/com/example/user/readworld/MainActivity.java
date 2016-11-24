@@ -78,7 +78,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import android.support.v4.widget.SwipeRefreshLayout;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback{
+public class MainActivity extends AppCompatActivity {
 
     SearchView searchView;
     GoogleMap mMap;
@@ -311,10 +311,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         menuItem.setChecked(true);
                         myFavorite();
                         break;
-                    case R.id.setting:
-                        toolbar.setTitle(R.string.setting);
+                    case R.id.about:
+                        toolbar.setTitle(R.string.about);
                         menuItem.setChecked(true);
-                        setting();
+                        about();
                         break;
                     case R.id.info:
                         toolbar.setTitle(R.string.info);
@@ -677,9 +677,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     // 總覽
     private void overview() {
         // 先移除所有的動態view
-        linearLayout.removeView(recycle);
-        linearLayout.removeView(recycle2);
-        linearLayout.removeView(recycle3);
+        linearLayout.removeView(recycle);   // overview
+        linearLayout.removeView(recycle2);  // search
+        linearLayout.removeView(recycle3);  // myFavorite
         /*
         *
         *
@@ -689,7 +689,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // 再新增自己的view
         linearLayout.addView(recycle);
     }
-    // todo 地圖
+    // 地圖
     private void map() {
         // 先移除所有的動態view
         //linearLayout.removeView(recycle);
@@ -723,52 +723,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //ma.onCreate(bundle);
     }
 
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        mMap.setMyLocationEnabled(true);
-        mMap.setBuildingsEnabled(true);
-        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        mMap.getUiSettings().setIndoorLevelPickerEnabled(true);
-        mMap.getUiSettings().setZoomControlsEnabled(true);
-        mMap.getUiSettings().setCompassEnabled(true);
-        mMap.getUiSettings().setMyLocationButtonEnabled(true);
-        mMap.getUiSettings().setMapToolbarEnabled(true);
-        mMap.getFocusedBuilding();
-
-        // Add  markers
-        List<LatLng> points = new ArrayList<LatLng>();
-
-        for(int i = 0; i < longitude.length; i++) {
-            if(latitude[i].isEmpty() || longitude[i].isEmpty()) {
-                points.add(new LatLng(0, 0));
-            }
-            else {
-                points.add(new LatLng(Double.valueOf(latitude[i]), Double.valueOf(longitude[i])));
-                mMap.addMarker(new MarkerOptions().position(points.get(i)).draggable(true).title(name[i]).snippet(address[i]));
-            }
-        }
-        mMap.animateCamera(CameraUpdateFactory.newLatLng(points.get(0)));
-    }
-
     // 我的最愛
     private void myFavorite() {
         // 先移除所有的動態view
         linearLayout.removeView(recycle);
         linearLayout.removeView(recycle2);
         linearLayout.removeView(recycle3);
-        /* TODO
+        /*
         *
         *
         */
@@ -810,18 +771,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             recycle3.setAdapter(myAdapter);
 
             linearLayout.addView(recycle3);
-
         }
 
-
-
-
     }
-    // 設定
-    private void setting() {
+    // 關於我
+    private void about() {
         // 先移除所有的動態view
         linearLayout.removeView(recycle);
-        /* TODO
+        linearLayout.removeView(recycle2);
+        linearLayout.removeView(recycle3);
+        /* TODO 關於我
         *
         *
         */
@@ -831,7 +790,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void info() {
         // 先移除所有的動態view
         linearLayout.removeView(recycle);
-        /* TODO
+        linearLayout.removeView(recycle2);
+        linearLayout.removeView(recycle3);
+        /* TODO 說明
         *
         *
         */
@@ -1009,7 +970,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
 
         @Override
-        public void onBindViewHolder(ViewHolder holder, final int position) {
+        public void onBindViewHolder(final ViewHolder holder, final int position) {
             holder.mainTitle.setText(mData.get(position));
             holder.cityTitle.setText(mData2.get(position));
             holder.addrTitle.setText(mData3.get(position));
@@ -1028,7 +989,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             holder.cardrelative.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //Toast.makeText(MainActivity.this, (position+1)+" pressed", Toast.LENGTH_SHORT).show();
+
+                    int count = 0;
+                    //Toast.makeText(MainActivity.this, holder.mainTitle.getText()+" pressed", Toast.LENGTH_SHORT).show();
+
+
+                    for(int i = 0; i < name.length; i++) {
+                        if(holder.mainTitle.getText().equals(name[i])) {
+                            count = i;
+                            break;
+                        }
+                    }
 
                     Intent intent = new Intent();
                     intent.setClass(MainActivity.this, StoreInfoActivity.class);
@@ -1047,7 +1018,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     bundle.putStringArray("facebook", facebook);
                     bundle.putStringArray("website", website);
                     bundle.putStringArray("arriveWay", arriveWay);
-                    bundle.putInt("index", position);
+                    bundle.putInt("index", count);
                     bundle.putString("id", id);
 
                     intent.putExtras(bundle);

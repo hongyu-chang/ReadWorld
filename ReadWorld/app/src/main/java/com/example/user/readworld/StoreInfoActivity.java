@@ -88,7 +88,7 @@ public class StoreInfoActivity extends AppCompatActivity {
 
             // 沒有資料表示沒有任何一家加入最愛過
             if(c.getCount() == 0) {
-                Toast.makeText(StoreInfoActivity.this, "沒資料QQ", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(StoreInfoActivity.this, "沒資料QQ", Toast.LENGTH_SHORT).show();
             }
 
             //
