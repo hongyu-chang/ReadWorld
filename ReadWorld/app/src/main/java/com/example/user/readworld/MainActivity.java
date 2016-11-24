@@ -291,10 +291,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         toolbar.setTitle(R.string.overview);
                         overview();
                         break;
-                    case R.id.nearby:
-                        toolbar.setTitle(R.string.nearby);
-                        nearby();
-                        break;
                     case R.id.map:
                         toolbar.setTitle(R.string.map);
                         map();
@@ -614,73 +610,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // 再新增自己的view
         linearLayout.addView(recycle);
     }
-
-    // 附近的店家
-    private void nearby() {
-        // 先移除所有的動態view
-        linearLayout.removeView(recycle);
-        /*
-        *
-        *
-        */
-
-
-        //取得系統定位服務
-        LocationManager status = (LocationManager) (this.getSystemService(Context.LOCATION_SERVICE));
-        if (status.isProviderEnabled(LocationManager.GPS_PROVIDER) || status.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-            //如果GPS或網路定位開啟
-            //取得定位權限
-            mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
-            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 10000.0f, LocationChange);
-        }
-        else {
-            Toast.makeText(this, "請開啟定位服務", Toast.LENGTH_LONG).show();
-            startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));	//開啟設定頁面
-        }
-    } // end nearby
-
-    //更新定位Listener
-    public LocationListener LocationChange = new LocationListener()
-    {
-        // 當地點改變時
-        @Override
-        public void onLocationChanged(android.location.Location location) {
-            location.getLatitude();
-            location.getLongitude();
-            Toast.makeText(MainActivity.this, "緯度: "+location.getLatitude()+"\n經度: "+location.getLongitude(), Toast.LENGTH_SHORT).show();
-        }
-
-        // 定位狀態改變
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-
-        }
-
-        // 當GPS或網路定位功能開啟
-        @Override
-        public void onProviderEnabled(String provider) {
-
-        }
-
-        // 當GPS或網路定位功能關閉時
-        @Override
-        public void onProviderDisabled(String provider) {
-
-        }
-
-    };
-
-
     // todo 地圖
     private void map() {
         // 先移除所有的動態view
