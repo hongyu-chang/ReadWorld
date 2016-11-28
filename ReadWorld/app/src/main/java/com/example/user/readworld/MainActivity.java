@@ -170,6 +170,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Toast.makeText(this.getApplicationContext(), userName, Toast.LENGTH_SHORT).show();
+
         searchView = new SearchView(this);
         linearLayout = (LinearLayout) findViewById(R.id.linearlayout);
         //recycle = (RecyclerView) findViewById(R.id.recycler_view);
@@ -231,6 +233,8 @@ public class MainActivity extends AppCompatActivity {
         userEmail = intent.getStringExtra("email");
         id = intent.getStringExtra("id");
         photoString = intent.getStringExtra("photoString");
+
+        //Toast.makeText(this.getApplicationContext(), userName, Toast.LENGTH_SHORT).show();
 
         // 若google登入
         if (id != null) { // 有id表示有登入
@@ -998,6 +1002,7 @@ public class MainActivity extends AppCompatActivity {
                     bundle.putStringArray("arriveWay", arriveWay);
                     bundle.putInt("index", count);
                     bundle.putString("id", id);
+                    bundle.putString("userName", userName);
 
                     intent.putExtras(bundle);
                     startActivity(intent);

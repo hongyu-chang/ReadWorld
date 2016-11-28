@@ -3,6 +3,11 @@ package com.example.user.readworld;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Environment;
 import android.provider.ContactsContract;
 import android.support.v4.view.GravityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -18,10 +23,15 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 public class StoreInfoActivity extends AppCompatActivity {
 
     private ImageView image;
     private ImageView star;
+    private ImageView share;
     private TextView store;
     private TextView city;
     private TextView addr;
@@ -50,6 +60,7 @@ public class StoreInfoActivity extends AppCompatActivity {
 
         image = (ImageView) findViewById(R.id.imageView);
         star = (ImageView)findViewById(R.id.star);
+        share = (ImageView) findViewById(R.id.shareIco);
         store = (TextView) findViewById(R.id.title);
         city = (TextView) findViewById(R.id.cityContent);
         addr = (TextView) findViewById(R.id.addressContent);
@@ -59,10 +70,10 @@ public class StoreInfoActivity extends AppCompatActivity {
         howTo = (TextView) findViewById(R.id.arriveContent);
         isFavorite = false;
 
-        Intent intent = this.getIntent();
+        final Intent intent = this.getIntent();
         final int index = intent.getIntExtra("index", 1);
-        String[] name = intent.getStringArrayExtra("name");
-        String[] representImage = intent.getStringArrayExtra("representImage");
+        final String[] name = intent.getStringArrayExtra("name");
+        final String[] representImage = intent.getStringArrayExtra("representImage");
         String[] intro = intent.getStringArrayExtra("intro");
         String[] cityName = intent.getStringArrayExtra("cityName");
         String[] address = intent.getStringArrayExtra("address");
@@ -75,10 +86,12 @@ public class StoreInfoActivity extends AppCompatActivity {
         String[] website = intent.getStringArrayExtra("website");
         String[] arriveWay = intent.getStringArrayExtra("arriveWay");
         final String id = intent.getStringExtra("id");
+        final String name_ = intent.getStringExtra("userName");
 
         // 如果是訪客(沒有id)則沒有最愛功能, 所以把星星符號隱藏
         if(id == null || id == "0" || id.isEmpty()) {
             star.setVisibility(View.INVISIBLE);
+            //share.setVisibility(View.INVISIBLE);
         }
 
         // 如果是會員 先查詢有無曾經加到我的最愛
@@ -144,7 +157,62 @@ public class StoreInfoActivity extends AppCompatActivity {
             }
         });
 
+
+        share.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                if(representImage[index].isEmpty()) {
+                    intent.setType("text/plain");
+                }
+                else {
+
+                    Uri bmpUri = getLocalBitmapUri(image);
+                    intent.setType("image/*");
+                    intent.putExtra(Intent.EXTRA_STREAM, bmpUri);
+                }
+
+                intent.putExtra(Intent.EXTRA_SUBJECT, "分享");
+                intent.putExtra(Intent.EXTRA_TEXT, name_+" 和你分享了 "+name[index]);
+                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                startActivity(Intent.createChooser(intent, "分享到"));
+
+                return false;
+            }
+        });
+
     }
+
+    ///
+
+    public Uri getLocalBitmapUri(ImageView imageView) {
+        // Extract Bitmap from ImageView drawable
+        Drawable drawable = imageView.getDrawable();
+        Bitmap bmp = null;
+        if (drawable instanceof BitmapDrawable){
+            bmp = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+        } else {
+            return null;
+        }
+        // Store image to default external storage directory
+        Uri bmpUri = null;
+        try {
+            File file =  new File(Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DOWNLOADS), "share_image_" + System.currentTimeMillis() + ".png");
+            file.getParentFile().mkdirs();
+            FileOutputStream out = new FileOutputStream(file);
+            bmp.compress(Bitmap.CompressFormat.PNG, 90, out);
+            out.close();
+            bmpUri = Uri.fromFile(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return bmpUri;
+    }
+
+
+    ///
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {

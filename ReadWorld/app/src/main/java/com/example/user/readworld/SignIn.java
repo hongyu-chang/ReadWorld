@@ -175,6 +175,8 @@ public class SignIn extends AppCompatActivity implements GoogleApiClient.OnConne
             Intent intent = new Intent();
             intent.setClass(SignIn.this, MainActivity.class);
 
+            //Toast.makeText(this.getApplicationContext(), name, Toast.LENGTH_SHORT).show();
+
             intent.putExtra("name", name);
             intent.putExtra("email", email);
             intent.putExtra("id", id);
