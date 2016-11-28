@@ -1,6 +1,7 @@
 package com.example.user.readworld;
 
 import android.Manifest;
+import android.app.Fragment;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,6 +12,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -34,8 +36,14 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.Layout;
 import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.AbsoluteSizeSpan;
+import android.text.style.AlignmentSpan;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -46,6 +54,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -56,6 +65,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.vision.text.Text;
 import com.jaeger.library.StatusBarUtil;
 import com.squareup.picasso.Picasso;
 
@@ -97,7 +107,10 @@ public class MainActivity extends AppCompatActivity {
     CardView card;                      // 用卡片的方式來列出所有書店
     RecyclerView recycle;               // 卡片要裝進這個view來顯示
     RecyclerView recycle2;              // 搜尋用recycle
-    RecyclerView recycle3;
+    RecyclerView recycle3;              // 我的最愛recycle
+    TextView about;                     // 關於
+    TextView explan;                    // 說明
+    ImageView aboutcover;
 
     // for google user information, google登入後的資訊
     String userName;                    // 使用者姓名
@@ -179,6 +192,9 @@ public class MainActivity extends AppCompatActivity {
         recycle2 = new RecyclerView(this);
         recycle3 = new RecyclerView(this);
         card = (CardView) findViewById(R.id.card_view);
+        about = new TextView(this);
+        aboutcover = new ImageView(this);
+        explan = new TextView(this);
         //storeList = new ListView(this); // 目前不使用listview, 用cardview
 
         //empty = new TextView(this); // 清空的
@@ -676,6 +692,8 @@ public class MainActivity extends AppCompatActivity {
         linearLayout.removeView(recycle);   // overview
         linearLayout.removeView(recycle2);  // search
         linearLayout.removeView(recycle3);  // myFavorite
+        linearLayout.removeView(about);
+        linearLayout.removeView(explan);
         /*
         *
         *
@@ -712,6 +730,8 @@ public class MainActivity extends AppCompatActivity {
         linearLayout.removeView(recycle);
         linearLayout.removeView(recycle2);
         linearLayout.removeView(recycle3);
+        linearLayout.removeView(about);
+        linearLayout.removeView(explan);
         /*
         *
         *
@@ -763,10 +783,23 @@ public class MainActivity extends AppCompatActivity {
         linearLayout.removeView(recycle);
         linearLayout.removeView(recycle2);
         linearLayout.removeView(recycle3);
+        linearLayout.removeView(about);
+        linearLayout.removeView(explan);
         /* TODO 關於我
         *
         *
         */
+
+        String text = "\n\n\n\n製作團隊\n\n陳亮宇\n張弘瑜\n鍾羽函\n蘇柏丞\n謝宣緯";
+        SpannableString spannable = new SpannableString(text);
+        spannable.setSpan(new AbsoluteSizeSpan(80), 0, text.length(), Spanned.SPAN_EXCLUSIVE_INCLUSIVE);
+        spannable.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER), 0, text.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannable.setSpan(new ForegroundColorSpan(Color.parseColor("#FF533210")), 0, text.length(), Spanned.SPAN_EXCLUSIVE_INCLUSIVE);
+
+        spannable.setSpan(new AbsoluteSizeSpan(120), 4, 8, Spanned.SPAN_EXCLUSIVE_INCLUSIVE);
+
+        about.setText(spannable);
+        linearLayout.addView(about);
 
     }
     // 說明
@@ -775,10 +808,15 @@ public class MainActivity extends AppCompatActivity {
         linearLayout.removeView(recycle);
         linearLayout.removeView(recycle2);
         linearLayout.removeView(recycle3);
+        linearLayout.removeView(about);
+        linearLayout.removeView(explan);
         /* TODO 說明
         *
         *
         */
+        String text = "這是一個";
+
+
 
     }
 
