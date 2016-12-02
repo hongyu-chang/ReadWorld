@@ -248,6 +248,7 @@ public class MainActivity extends AppCompatActivity {
         userName = intent.getStringExtra("name");
         userEmail = intent.getStringExtra("email");
         id = intent.getStringExtra("id");
+
         photoString = intent.getStringExtra("photoString");
 
         //Toast.makeText(this.getApplicationContext(), userName, Toast.LENGTH_SHORT).show();
@@ -870,8 +871,8 @@ public class MainActivity extends AppCompatActivity {
                     storeCityName += jsonObj.getJSONObject(i).get("cityName")+"\n";
                     storeFacebook += jsonObj.getJSONObject(i).opt("facebook")+"\n";
 
-                    if(jsonObj.getJSONObject(i).opt("representImage") == null) {
-                        storeRepresentImage += "\n";
+                    if(jsonObj.getJSONObject(i).opt("representImage") == null || jsonObj.getJSONObject(i).opt("representImage") == "null") {
+                        storeRepresentImage += "null\n";
                     }
                     else {
                         storeRepresentImage += jsonObj.getJSONObject(i).opt("representImage")+"\n";
