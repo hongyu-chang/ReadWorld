@@ -137,7 +137,7 @@ public class SignIn extends AppCompatActivity implements GoogleApiClient.OnConne
                 // 進入下一個activity
                 Intent intent = new Intent();
                 intent.setClass(SignIn.this, MainActivity.class);
-                intent.putExtra("id", "0");
+                intent.putExtra("id", 0);
                 startActivity(intent);
                 SignIn.this.finish();
             }
