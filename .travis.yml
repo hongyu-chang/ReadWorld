@@ -1,8 +1,9 @@
 language: android
 sudo: required
-gradle build connectedCheck
+
 android:
   components:
+      gradle build connectedCheck
       # Uncomment the lines below if you want to
       # use the latest revision of Android SDK Tools
       # - platform-tools
