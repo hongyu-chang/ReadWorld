@@ -1,4 +1,4 @@
-# 獨立書店 Android App
+# 獨立書店 Android App [![Build Status](https://travis-ci.org/HarrisQs/ReadWorld.svg?branch=master)](https://travis-ci.org/HarrisQs/ReadWorld)
 ###### tags: `人機` `內嵌` `1103`
 
 1. 功能
