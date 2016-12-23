@@ -1,6 +1,6 @@
 language: android
 sudo: required
-install: ant deps
+gradle build connectedCheck
 android:
   components:
       # Uncomment the lines below if you want to
