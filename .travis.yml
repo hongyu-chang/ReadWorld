@@ -7,5 +7,5 @@ android:
     - extra-android-support
 before_install:
 - chmod +x ./ReadWorld/gradlew
-script:
-  - ./ReadWorld/gradlew assembleRelease
+#script:
+#  - ./ReadWorld/gradlew assembleRelease
