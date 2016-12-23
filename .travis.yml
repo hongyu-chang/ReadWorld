@@ -8,4 +8,4 @@ android:
 before_install:
 - chmod +x ./ReadWorld/gradlew
 script:
-  - ./ReadWorld/gradlew assembleRelease
+  - ./ReadWorld/gradlew
