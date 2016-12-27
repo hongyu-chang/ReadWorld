@@ -203,10 +203,10 @@ public class SignIn extends AppCompatActivity implements GoogleApiClient.OnConne
     private void saveSetting() {
         SharedPreferences setting = getSharedPreferences("profile_info", 0);
         setting.edit().putBoolean("isFirst", false).commit();
-        //setting.edit().putString("id", null).commit();
-        //setting.edit().putString("name", null).commit();
-        //setting.edit().putString("email", null).commit();
-        //setting.edit().putString("photoUri", null).commit();
+        setting.edit().putString("id", null).commit();
+        setting.edit().putString("name", null).commit();
+        setting.edit().putString("email", null).commit();
+        setting.edit().putString("photoUri", null).commit();
     } // [END saveSetting]
 
     // [START readSetting] 讀取設定狀態

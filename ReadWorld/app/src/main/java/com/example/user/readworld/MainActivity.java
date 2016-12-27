@@ -778,7 +778,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
-    // 關於我
+    // 關於我們
     private void about() {
         // 先移除所有的動態view
         linearLayout.removeView(recycle);
@@ -786,18 +786,19 @@ public class MainActivity extends AppCompatActivity {
         linearLayout.removeView(recycle3);
         linearLayout.removeView(about);
         linearLayout.removeView(explan);
-        /* TODO 關於我
+        /* TODO 關於我們
         *
         *
         */
 
-        String text = "\n\n\n\n製作團隊\n\n陳亮宇\n張弘瑜\n鍾羽函\n蘇柏丞\n謝宣緯";
+        String text = "\n\n\n開發成員 : \n\n陳亮宇\n陳崧源\n\n\n\n\t資料來源 : 行政院文化局";
         SpannableString spannable = new SpannableString(text);
         spannable.setSpan(new AbsoluteSizeSpan(80), 0, text.length(), Spanned.SPAN_EXCLUSIVE_INCLUSIVE);
         spannable.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER), 0, text.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         spannable.setSpan(new ForegroundColorSpan(Color.parseColor("#FF533210")), 0, text.length(), Spanned.SPAN_EXCLUSIVE_INCLUSIVE);
 
-        spannable.setSpan(new AbsoluteSizeSpan(120), 4, 8, Spanned.SPAN_EXCLUSIVE_INCLUSIVE);
+        spannable.setSpan(new AbsoluteSizeSpan(100), 3, 7, Spanned.SPAN_EXCLUSIVE_INCLUSIVE);
+        spannable.setSpan(new AbsoluteSizeSpan(100), 24, 28, Spanned.SPAN_EXCLUSIVE_INCLUSIVE);
 
         about.setText(spannable);
         linearLayout.addView(about);
@@ -815,9 +816,14 @@ public class MainActivity extends AppCompatActivity {
         *
         *
         */
-        String text = "這是一個";
+        String text = "\n\n\n    這是一個彙整台灣獨立書店的app，資料取自文化局的開放資源，主要目的在於提供沒接觸過或是剛接觸獨立書店的民眾，可以找尋到自己生活周遭哪裡有獨立書店，該如何拜訪、參觀，並且了解各個獨立店家的特色";
+        SpannableString spannable = new SpannableString(text);
+        spannable.setSpan(new AbsoluteSizeSpan(80), 0, text.length(), Spanned.SPAN_EXCLUSIVE_INCLUSIVE);
+        spannable.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_NORMAL), 0, text.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannable.setSpan(new ForegroundColorSpan(Color.parseColor("#FF533210")), 0, text.length(), Spanned.SPAN_EXCLUSIVE_INCLUSIVE);
 
-
+        explan.setText(spannable);
+        linearLayout.addView(explan);
 
     }
 

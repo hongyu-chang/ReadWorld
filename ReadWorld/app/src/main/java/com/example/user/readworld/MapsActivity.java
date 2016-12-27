@@ -4,10 +4,12 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
+import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -34,6 +36,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     String[] address = new String[]{};
     String[] longitude = new String[]{};
     String[] latitude = new String[]{};
+    private static final int REQUEST_FINE_LOCATION_PERMISSION = 102;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,9 +80,60 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
+            requestLocationPermission();
             return;
         }
-        mMap.setMyLocationEnabled(true);
+        else {
+            mMap.setMyLocationEnabled(true);
+            mark();
+        }
+
+
+    }
+
+    private void requestLocationPermission() {
+        // 如果裝置版本是6.0（包含）以上
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            // 取得授權狀態，參數是請求授權的名稱
+            int hasPermission = checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION);
+
+            // 如果未授權
+            if (hasPermission != PackageManager.PERMISSION_GRANTED) {
+                // 請求授權
+                // 第一個參數是請求授權的名稱
+                // 第二個參數是請求代碼
+                requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_FINE_LOCATION_PERMISSION);
+            }
+            else {
+                mMap.setMyLocationEnabled(true);
+                mark();
+                // 啟動地圖與定位元件
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if(requestCode == REQUEST_FINE_LOCATION_PERMISSION) {
+            if(ActivityCompat.checkSelfPermission(this,
+                    android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                // Permission Granted
+                mMap.setMyLocationEnabled(true);
+                mark();
+            }
+            else {
+                // Permission Denied
+                Toast.makeText(this, "permission denied", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+
+    public void mark() {
+
+        //mMap.setMyLocationEnabled(true);
         mMap.setBuildingsEnabled(true);
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         mMap.getUiSettings().setIndoorLevelPickerEnabled(true);
@@ -189,4 +243,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mMap.animateCamera(CameraUpdateFactory.newLatLng(points.get(0)));
     }
+
+
 }

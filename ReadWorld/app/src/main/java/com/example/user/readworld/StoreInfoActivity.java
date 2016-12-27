@@ -91,7 +91,7 @@ public class StoreInfoActivity extends AppCompatActivity {
         // 如果是訪客(沒有id)則沒有最愛功能, 所以把星星符號隱藏
         if(id == null || id == "0" || id.isEmpty()) {
             star.setVisibility(View.INVISIBLE);
-            //share.setVisibility(View.INVISIBLE);
+            share.setVisibility(View.INVISIBLE);
         }
 
         // 如果是會員 先查詢有無曾經加到我的最愛
